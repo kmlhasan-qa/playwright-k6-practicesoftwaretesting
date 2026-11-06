@@ -1,18 +1,23 @@
-name: Playwright Tests
+name: Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      perf_smoke:
+        description: 'Also run the k6 smoke profile'
+        type: boolean
+        default: false
   push:
     branches: [main]
   pull_request:
   schedule:
-    - cron: '0 23 * * 1-5' # weekday nightly (06:00 WIB)
+    - cron: '0 23 * * 1-5' # weekday nightly
 
 permissions:
   contents: read
 
 jobs:
-  test:
+  playwright:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -21,22 +26,17 @@ jobs:
         project: [api, ui]
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
+      - run: npm ci
+      - run: npm run typecheck
       - name: Install Playwright browser
         if: matrix.project == 'ui'
         run: npx playwright install --with-deps chromium
-
       - name: Run ${{ matrix.project }} tests
         run: npx playwright test --project=${{ matrix.project }}
-
       - name: Upload HTML report
         if: always()
         uses: actions/upload-artifact@v4
@@ -44,3 +44,35 @@ jobs:
           name: playwright-report-${{ matrix.project }}
           path: playwright-report/
           retention-days: 14
+
+  postman:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:postman
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newman-junit
+          path: postman/results/newman-junit.xml
+
+  k6-smoke:
+    # Manual only: never generate load against the shared public demo automatically.
+    if: github.event_name == 'workflow_dispatch' && inputs.perf_smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: grafana/setup-k6-action@v1
+      - run: k6 run --summary-export perf/results/smoke-summary.json perf/checkout-load.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: k6-smoke-summary
+          path: perf/results/smoke-summary.json

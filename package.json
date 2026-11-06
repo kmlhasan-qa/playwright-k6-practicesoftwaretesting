@@ -1,23 +1,37 @@
 {
-  "name": "playwright-restful-booker",
+  "name": "playwright-practice-software-testing",
   "version": "1.0.0",
-  "description": "UI and API automation for the Restful Booker Platform demo (automationintesting.online)",
+  "description": "UI, API and performance testing for the Practice Software Testing Toolshop demo (practicesoftwaretesting.com)",
   "private": true,
   "type": "commonjs",
   "scripts": {
     "test": "playwright test",
-    "test:ui": "playwright test --project=ui",
     "test:api": "playwright test --project=api",
+    "test:ui": "playwright test --project=ui",
     "test:headed": "playwright test --project=ui --headed",
+    "test:e2e": "playwright test --grep @e2e",
+    "test:defects": "playwright test --grep @defect",
+    "test:no-defects": "playwright test --grep-invert @defect",
+    "test:postman": "newman run postman/toolshop-api.postman_collection.json --reporters cli,junit --reporter-junit-export postman/results/newman-junit.xml",
+    "perf:smoke": "k6 run --summary-export perf/results/smoke-summary.json perf/checkout-load.js",
+    "perf:load": "k6 run -e PROFILE=load --summary-export perf/results/load-summary.json perf/checkout-load.js",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit"
   },
-  "keywords": ["playwright", "qa", "automation", "restful-booker"],
+  "keywords": [
+    "playwright",
+    "qa",
+    "automation",
+    "k6",
+    "postman",
+    "toolshop"
+  ],
   "author": "Kamal Hasan",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.65.0",
     "@types/node": "^26.6.6",
+    "newman": "^6.2.3",
     "typescript": "^6.0.3"
   },
   "dependencies": {

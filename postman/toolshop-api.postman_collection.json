@@ -1,0 +1,1624 @@
+{
+  "info": {
+    "_postman_id": "22acff87-c347-5558-8197-5c3904f5df1d",
+    "name": "Toolshop API \u2013 checkout workflow",
+    "description": "API tests for https://practicesoftwaretesting.com (Toolshop API v5). Run top-to-bottom: requests share state through collection variables (token, productId, cartId, invoiceId). A fresh customer is registered on every run.\n\nCLI: npx newman run postman/toolshop-api.postman_collection.json",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Users & auth",
+      "description": "Registration, login and token-protected profile.",
+      "item": [
+        {
+          "name": "TC-API-004a Register new customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Qa\",\n  \"last_name\": \"Postman\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"dob\": \"1990-05-15\",\n  \"phone\": \"0612345678\",\n  \"address\": {\n    \"street\": \"Oudegracht\",\n    \"house_number\": \"1\",\n    \"city\": \"Utrecht\",\n    \"state\": \"Utrecht\",\n    \"country\": \"NL\",\n    \"postal_code\": \"3511AA\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Unique customer per run so the collection can be re-run against the shared demo.",
+                  "const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);",
+                  "pm.collectionVariables.set('email', `qa.postman.${id}@example.com`);",
+                  "pm.collectionVariables.set('password', `Qa!${id}Aa1`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Returns the created customer without password\", () => {",
+                  "  pm.expect(b.email).to.eql(pm.collectionVariables.get('email'));",
+                  "  pm.expect(b.id).to.be.a('string');",
+                  "  pm.expect(b).to.not.have.property('password');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-004b Register same email again",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Qa\",\n  \"last_name\": \"Postman\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"dob\": \"1990-05-15\",\n  \"phone\": \"0612345678\",\n  \"address\": {\n    \"street\": \"Oudegracht\",\n    \"house_number\": \"1\",\n    \"city\": \"Utrecht\",\n    \"state\": \"Utrecht\",\n    \"country\": \"NL\",\n    \"postal_code\": \"3511AA\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", () => pm.response.to.have.status(409));",
+                  "",
+                  "pm.test(\"Explains the duplicate email\", () => pm.expect(pm.response.json().email[0]).to.include('already exists'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-005 Register with weak password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Qa\",\n  \"last_name\": \"Postman\",\n  \"email\": \"weak.{{$timestamp}}@example.com\",\n  \"password\": \"alllower1!\",\n  \"dob\": \"1990-05-15\",\n  \"phone\": \"0612345678\",\n  \"address\": {\n    \"street\": \"Oudegracht\",\n    \"house_number\": \"1\",\n    \"city\": \"Utrecht\",\n    \"state\": \"Utrecht\",\n    \"country\": \"NL\",\n    \"postal_code\": \"3511AA\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 422\", () => pm.response.to.have.status(422));",
+                  "",
+                  "pm.test(\"Password rule message\", () => pm.expect(pm.response.json().password.join(' ')).to.include('uppercase and one lowercase'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-002 Login with wrong password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"wrong-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-001 Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Returns a bearer token\", () => {",
+                  "  pm.expect(b.token_type).to.eql('bearer');",
+                  "  pm.expect(b.access_token).to.be.a('string').and.not.empty;",
+                  "});",
+                  "pm.collectionVariables.set('token', b.access_token);",
+                  "pm.test(\"Response time < 5000 ms (sanity guard; performance is covered by k6)\", () => pm.expect(pm.response.responseTime).to.be.below(5000));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-001b Get own profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test(\"Profile belongs to the logged-in customer\", () => pm.expect(pm.response.json().email).to.eql(pm.collectionVariables.get('email')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-003 Get profile without token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Products",
+      "description": "Catalogue browsing.",
+      "item": [
+        {
+          "name": "TC-API-010 List products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products?page=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Paginated contract\", () => {",
+                  "  pm.expect(b.current_page).to.eql(1);",
+                  "  pm.expect(b.data).to.be.an('array').that.is.not.empty;",
+                  "  b.data.forEach(p => { pm.expect(p.id).to.be.a('string'); pm.expect(p.price).to.be.a('number').above(0); });",
+                  "});",
+                  "const p = b.data.find(x => x.in_stock && !x.is_rental && !x.is_location_offer);",
+                  "pm.test(\"A purchasable product exists\", () => pm.expect(p).to.be.ok);",
+                  "pm.collectionVariables.set('productId', p.id);",
+                  "pm.collectionVariables.set('productName', p.name);",
+                  "pm.collectionVariables.set('productPrice', p.price);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-011 Get product by id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "{{productId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test(\"Same product as in the list\", () => {",
+                  "  const b = pm.response.json();",
+                  "  pm.expect(b.id).to.eql(pm.collectionVariables.get('productId'));",
+                  "  pm.expect(b.price).to.eql(Number(pm.collectionVariables.get('productPrice')));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-012 Get unknown product",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/01AAAAAAAAAAAAAAAAAAAAAAAA",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "01AAAAAAAAAAAAAAAAAAAAAAAA"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-013 Search products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products/search?q=pliers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "pliers"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test(\"Only matching products\", () => pm.response.json().data.forEach(p => pm.expect(p.name.toLowerCase()).to.include('pliers')));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Cart",
+      "description": "Cart creation and quantity boundaries (min 1, max 99).",
+      "item": [
+        {
+          "name": "TC-API-020a Create cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "",
+                  "pm.collectionVariables.set('cartId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-020b Add 2 units",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{cartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts",
+                "{{cartId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{productId}}\",\n  \"quantity\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-021 Add quantity 0 (min-1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{cartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts",
+                "{{cartId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{productId}}\",\n  \"quantity\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 422\", () => pm.response.to.have.status(422));",
+                  "",
+                  "pm.test(\"quantity error\", () => pm.expect(pm.response.json().errors.quantity[0]).to.include('at least 1'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-021 Add quantity 100 (max+1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{cartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts",
+                "{{cartId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{productId}}\",\n  \"quantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 422\", () => pm.response.to.have.status(422));",
+                  "",
+                  "pm.test(\"quantity error\", () => pm.expect(pm.response.json().errors.quantity[0]).to.include('not be greater than 99'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-022 Add unknown product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{cartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts",
+                "{{cartId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"01AAAAAAAAAAAAAAAAAAAAAAAA\",\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 422\", () => pm.response.to.have.status(422));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-020c Get cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{cartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts",
+                "{{cartId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test(\"Cart holds exactly 2 units of the product\", () => {",
+                  "  const items = pm.response.json().cart_items;",
+                  "  pm.expect(items).to.have.length(1);",
+                  "  pm.expect(items[0].product_id).to.eql(pm.collectionVariables.get('productId'));",
+                  "  pm.expect(items[0].quantity).to.eql(2);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Checkout (payment & invoice)",
+      "description": "Billing address via postcode lookup, payment check, order creation.",
+      "item": [
+        {
+          "name": "Postcode lookup (billing address)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/postcode-lookup?country=NL&postcode=3511AA&house_number=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "postcode-lookup"
+              ],
+              "query": [
+                {
+                  "key": "country",
+                  "value": "NL"
+                },
+                {
+                  "key": "postcode",
+                  "value": "3511AA"
+                },
+                {
+                  "key": "house_number",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "const a = pm.response.json();",
+                  "pm.test(\"Returns city and state\", () => { pm.expect(a.city).to.be.a('string').and.not.empty; pm.expect(a.state).to.be.a('string'); });",
+                  "pm.collectionVariables.set('billingStreet', `${a.street} ${a.house_number}`);",
+                  "pm.collectionVariables.set('billingCity', a.city);",
+                  "pm.collectionVariables.set('billingState', a.state);",
+                  "pm.collectionVariables.set('billingCountry', 'NL');",
+                  "pm.collectionVariables.set('billingPostcode', '3511AA');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-030a Payment check \u2013 valid credit card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment",
+                "check"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_method\": \"credit-card\",\n  \"payment_details\": {\n    \"credit_card_number\": \"1111-1111-1111-1111\",\n    \"expiration_date\": \"{{cardExpiryFuture}}\",\n    \"cvv\": \"123\",\n    \"card_holder_name\": \"Qa Postman\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const fmt = d => String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();",
+                  "const f = new Date(); f.setDate(1); f.setMonth(f.getMonth() + 24);",
+                  "const p = new Date(); p.setDate(1); p.setMonth(p.getMonth() - 1);",
+                  "pm.collectionVariables.set('cardExpiryFuture', fmt(f));",
+                  "pm.collectionVariables.set('cardExpiryPast', fmt(p));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test(\"Payment successful\", () => pm.expect(pm.response.json().message).to.eql('Payment was successful'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-034 Payment check \u2013 expired card (last month)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment",
+                "check"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_method\": \"credit-card\",\n  \"payment_details\": {\n    \"credit_card_number\": \"1111-1111-1111-1111\",\n    \"expiration_date\": \"{{cardExpiryPast}}\",\n    \"cvv\": \"123\",\n    \"card_holder_name\": \"Qa Postman\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 422\", () => pm.response.to.have.status(422));",
+                  "",
+                  "pm.test(\"Only the expiry date is flagged\", () => pm.expect(Object.keys(pm.response.json().errors)).to.eql(['payment_details.expiration_date']));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-031 Create order without token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"billing_street\": \"{{billingStreet}}\",\n  \"billing_city\": \"{{billingCity}}\",\n  \"billing_state\": \"{{billingState}}\",\n  \"billing_country\": \"{{billingCountry}}\",\n  \"billing_postal_code\": \"{{billingPostcode}}\",\n  \"payment_method\": \"cash-on-delivery\",\n  \"payment_details\": {},\n  \"cart_id\": \"{{cartId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-032 Create order \u2013 city does not match postcode",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"billing_street\": \"{{billingStreet}}\",\n  \"billing_city\": \"Utrecht\",\n  \"billing_state\": \"Utrecht\",\n  \"billing_country\": \"{{billingCountry}}\",\n  \"billing_postal_code\": \"{{billingPostcode}}\",\n  \"payment_method\": \"cash-on-delivery\",\n  \"payment_details\": {},\n  \"cart_id\": \"{{cartId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 422\", () => pm.response.to.have.status(422));",
+                  "",
+                  "pm.test(\"Address validation message\", () => pm.expect(pm.response.json().billing_country[0]).to.include('city does not belong'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-033 Create order \u2013 unknown cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"billing_street\": \"{{billingStreet}}\",\n  \"billing_city\": \"{{billingCity}}\",\n  \"billing_state\": \"{{billingState}}\",\n  \"billing_country\": \"{{billingCountry}}\",\n  \"billing_postal_code\": \"{{billingPostcode}}\",\n  \"payment_method\": \"cash-on-delivery\",\n  \"payment_details\": {},\n  \"cart_id\": \"does-not-exist\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-030b Create order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"billing_street\": \"{{billingStreet}}\",\n  \"billing_city\": \"{{billingCity}}\",\n  \"billing_state\": \"{{billingState}}\",\n  \"billing_country\": \"{{billingCountry}}\",\n  \"billing_postal_code\": \"{{billingPostcode}}\",\n  \"payment_method\": \"cash-on-delivery\",\n  \"payment_details\": {},\n  \"cart_id\": \"{{cartId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "",
+                  "const b = pm.response.json();",
+                  "const expected = Math.round(Number(pm.collectionVariables.get('productPrice')) * 2 * 100) / 100;",
+                  "pm.test(\"Invoice number issued\", () => pm.expect(b.invoice_number).to.match(/^INV-\\d+$/));",
+                  "pm.test(\"Total = unit price x 2\", () => pm.expect(b.total).to.eql(expected));",
+                  "pm.test(\"Billing address persisted\", () => pm.expect(b.billing_city).to.eql(pm.collectionVariables.get('billingCity')));",
+                  "pm.collectionVariables.set('invoiceId', b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-API-030c Get invoice",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices/{{invoiceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices",
+                "{{invoiceId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Awaiting fulfilment with one line of 2 units\", () => {",
+                  "  pm.expect(b.status).to.eql('AWAITING_FULFILLMENT');",
+                  "  pm.expect(b.invoicelines).to.have.length(1);",
+                  "  pm.expect(b.invoicelines[0].quantity).to.eql(2);",
+                  "  pm.expect(b.invoicelines[0].product_id).to.eql(pm.collectionVariables.get('productId'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Defect reproduction (evidence)",
+      "description": "Each request reproduces a reported defect. Assertions document the CURRENT (incorrect) behaviour so the run doubles as evidence; the expected behaviour is stated in the test name.",
+      "item": [
+        {
+          "name": "DEF-002 Checkout the same cart a second time",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "description": "Expected: 4xx (cart already ordered). Actual: 201 and a second invoice.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"billing_street\": \"{{billingStreet}}\",\n  \"billing_city\": \"{{billingCity}}\",\n  \"billing_state\": \"{{billingState}}\",\n  \"billing_country\": \"{{billingCountry}}\",\n  \"billing_postal_code\": \"{{billingPostcode}}\",\n  \"payment_method\": \"cash-on-delivery\",\n  \"payment_details\": {},\n  \"cart_id\": \"{{cartId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DEF-002 reproduced \u2013 duplicate order accepted (expected 4xx, got \" + pm.response.code + \")\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"A different invoice number was issued\", () => pm.expect(pm.response.json().id).to.not.eql(pm.collectionVariables.get('invoiceId')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEF-003 a) Create empty cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "",
+                  "pm.collectionVariables.set('emptyCartId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DEF-003 b) Order the empty cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "description": "Expected: 422 (cart is empty). Actual: 201 with total 0.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"billing_street\": \"{{billingStreet}}\",\n  \"billing_city\": \"{{billingCity}}\",\n  \"billing_state\": \"{{billingState}}\",\n  \"billing_country\": \"{{billingCountry}}\",\n  \"billing_postal_code\": \"{{billingPostcode}}\",\n  \"payment_method\": \"cash-on-delivery\",\n  \"payment_details\": {},\n  \"cart_id\": \"{{emptyCartId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DEF-003 reproduced \u2013 order for empty cart accepted (expected 422, got \" + pm.response.code + \")\", () => pm.response.to.have.status(201));",
+                  "pm.test(\"Invoice total is 0\", () => pm.expect(pm.response.json().total).to.eql(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "OBS-1 a) Create cart with 60 units",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "",
+                  "pm.collectionVariables.set('capCartId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "OBS-1 b) Add 60",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{capCartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts",
+                "{{capCartId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{productId}}\",\n  \"quantity\": 60\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "OBS-1 c) Add 60 again",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{capCartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts",
+                "{{capCartId}}"
+              ]
+            },
+            "description": "Expected: 422 or quantity capped at 99. Actual: 200.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{productId}}\",\n  \"quantity\": 60\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "OBS-1 d) Cart line exceeds 99",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{capCartId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "carts",
+                "{{capCartId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"OBS-1 reproduced \u2013 line quantity is 120 (max is 99)\", () => pm.expect(pm.response.json().cart_items[0].quantity).to.eql(120));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "OBS-3 Payment check with unknown method",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payment/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payment",
+                "check"
+              ]
+            },
+            "description": "Expected: 422. Actual: 200 'Payment was successful'.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_method\": \"bitcoin\",\n  \"payment_details\": {}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"OBS-3 reproduced \u2013 unknown payment method reported successful\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.practicesoftwaretesting.com"
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "productId",
+      "value": ""
+    },
+    {
+      "key": "productName",
+      "value": ""
+    },
+    {
+      "key": "productPrice",
+      "value": ""
+    },
+    {
+      "key": "cartId",
+      "value": ""
+    },
+    {
+      "key": "invoiceId",
+      "value": ""
+    },
+    {
+      "key": "emptyCartId",
+      "value": ""
+    },
+    {
+      "key": "capCartId",
+      "value": ""
+    },
+    {
+      "key": "billingStreet",
+      "value": ""
+    },
+    {
+      "key": "billingCity",
+      "value": ""
+    },
+    {
+      "key": "billingState",
+      "value": ""
+    },
+    {
+      "key": "billingCountry",
+      "value": ""
+    },
+    {
+      "key": "billingPostcode",
+      "value": ""
+    },
+    {
+      "key": "cardExpiryFuture",
+      "value": ""
+    },
+    {
+      "key": "cardExpiryPast",
+      "value": ""
+    }
+  ]
+}

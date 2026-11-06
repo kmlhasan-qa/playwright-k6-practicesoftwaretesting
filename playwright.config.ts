@@ -7,11 +7,11 @@ import { BASE_URL, HEADLESS } from './helpers/config';
  *  - `ui`  runs browser specs against Desktop Chrome
  *
  * The demo is a shared public environment, so the suite runs with a small
- * worker count and one retry to absorb transient network noise.
+ * worker count and one retry on CI to absorb transient network noise.
  */
 export default defineConfig({
   testDir: './tests',
-  timeout: 45_000,
+  timeout: 60_000,
   expect: { timeout: 10_000 },
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -21,6 +21,8 @@ export default defineConfig({
   use: {
     baseURL: BASE_URL,
     headless: HEADLESS,
+    // The Toolshop front end exposes stable `data-test` hooks on every interactive element.
+    testIdAttribute: 'data-test',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
