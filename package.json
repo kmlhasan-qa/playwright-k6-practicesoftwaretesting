@@ -1,0 +1,26 @@
+{
+  "name": "playwright-restful-booker",
+  "version": "1.0.0",
+  "description": "UI and API automation for the Restful Booker Platform demo (automationintesting.online)",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --project=ui",
+    "test:api": "playwright test --project=api",
+    "test:headed": "playwright test --project=ui --headed",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["playwright", "qa", "automation", "restful-booker"],
+  "author": "Kamal Hasan",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^26.6.6",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.9"
+  }
+}
