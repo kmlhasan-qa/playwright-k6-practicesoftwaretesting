@@ -7,8 +7,7 @@ Test automation for the public demo **[Practice Software Testing – Toolshop](h
 | UI + API automation (Playwright + TypeScript) | `tests/`, `pages/`, `fixtures/`, `helpers/` |
 | Postman collection (+ last run result) | `postman/toolshop-api.postman_collection.json`, `postman/results/` |
 | k6 performance script (+ smoke result) | `perf/checkout-load.js`, `perf/results/` |
-| Test cases, defect reports, API & performance write-up | `docs/assessment-report.md` |
-| Full test case catalogue, automated tests and why, automation explained | `docs/test-cases-and-automation.md` (Word: `.docx`) |
+| Test case catalogue, automated tests and why, automation explained, defect list and reports | `docs/test-cases-and-automation.docx` |
 | Every run command on one page | [`RUN_COMMANDS.md`](RUN_COMMANDS.md) |
 
 ---
@@ -44,10 +43,11 @@ Environment variables (`.env` or shell): `BASE_URL`, `API_URL`, `HEADLESS`, `CUS
 
 **CI:** `.github/workflows/playwright.yml` runs the `api` and `ui` projects plus the Postman collection on every push, every PR and nightly, and uploads the reports. The k6 smoke run is manual only (workflow_dispatch), so the public demo never gets automatic load.
 
-**Last local run (6 Nov 2026):**
-- Playwright: 40 passed (33 functional tests; the other 7 are known-defect tests that fail as expected).
-- newman: 33 requests, 56/56 assertions passed.
-- k6 smoke: every threshold passed; 119 orders with 0% errors.
+**Last local run (7 Nov 2026):**
+- Playwright UI: 3 passed (TC-UI-001, TC-UI-002; TC-UI-003 is the DEF-001 test and fails as expected).
+- Playwright API: 37 passed (31 functional tests; the other 6 are known-defect tests that fail as expected).
+- newman: 33 requests, 56/56 assertions passed (last run 6 Nov 2026).
+- k6 smoke: every threshold passed; 121 of 121 orders with 0% errors and 0 dropped iterations. Booking p95: normal 487 ms, ramp 528 ms, peak 400 ms, recovery 395 ms.
 
 ---
 
@@ -74,7 +74,7 @@ Environment variables (`.env` or shell): `BASE_URL`, `API_URL`, `HEADLESS`, `CUS
 │       └── checkout.e2e.spec.ts   # TC-UI-001 E2E, TC-UI-002 negative, TC-UI-003 regression
 ├── postman/                   # collection + newman JUnit result
 ├── perf/checkout-load.js      # k6 load model (smoke | load)
-├── docs/assessment-report.md  # test cases, defects, API & performance approach
+├── docs/test-cases-and-automation.docx  # test cases, automation, performance, defects
 └── .github/workflows/playwright.yml
 ```
 
@@ -103,18 +103,26 @@ Environment variables (`.env` or shell): `BASE_URL`, `API_URL`, `HEADLESS`, `CUS
 
 ## 3. Defects found (summary)
 
-Full structured reports: `docs/assessment-report.md`.
+Full reports, sorted by severity and priority: `docs/test-cases-and-automation.docx`, section 4. DEF-004–006 and OBS-6–10 were found by exploratory API testing on 7 Nov 2026 and have no automated test yet.
 
-| ID | Severity | Summary | Covered by |
-|---|---|---|---|
-| DEF-001 | **High** | When `POST /invoices` is rejected, the UI shows no error and keeps showing "Payment was successful". The customer believes the order went through. | TC-UI-003 |
-| DEF-002 | **High** | The same cart can be checked out repeatedly, and every call creates a new order (double-click, retry or second tab gives duplicate orders). | TC-API-040, Postman |
-| DEF-003 | **High** | An order (invoice of 0.00) can be created for an **empty cart**. | TC-API-041, Postman |
-| OBS-1 | Medium | The quantity limit of 99 can be bypassed by adding the same product twice (line quantity 120). | TC-API-042 |
-| OBS-2 | Medium | Race on the address step: the asynchronously pre-filled saved address can overwrite the postcode-lookup values, or the other way round. | page object workaround |
-| OBS-3 | Medium | `POST /payment/check` returns "Payment was successful" for an unknown method (`bitcoin`) and for an empty body. | TC-API-043 |
-| OBS-4 | Medium | A malformed credit card on `POST /invoices` returns **500** instead of 422. | TC-API-044 |
-| OBS-5 | Low | `billing_postal_code` is required by the API spec but can be omitted (201), which also skips the address check. | TC-API-045 |
+| ID | Severity | Priority | Summary | Covered by |
+|---|---|---|---|---|
+| DEF-001 | **High** | P1 | When `POST /invoices` is rejected, the UI shows no error and keeps showing "Payment was successful". The customer believes the order went through. | TC-UI-003 |
+| DEF-002 | **High** | P1 | The same cart can be checked out repeatedly, and every call creates a new order (double-click, retry or second tab gives duplicate orders). | TC-API-040, Postman |
+| DEF-004 | **High** | P1 | `POST /invoices` accepts an **expired credit card** (201, order created). Expiry is only checked by `/payment/check`, which API clients can skip. | manual (7 Nov) |
+| DEF-005 | **High** | P1 | The **full card number and CVV** are stored and returned in plain text by `GET /invoices/{id}`. | manual (7 Nov) |
+| DEF-003 | **High** | P2 | An order (invoice of 0.00) can be created for an **empty cart**. | TC-API-041, Postman |
+| DEF-006 | **High** | P2 | **Out-of-stock** products can be added to the cart and ordered (201). | manual (7 Nov) |
+| OBS-1 | Medium | P2 | The quantity limit of 99 can be bypassed by adding the same product twice (line quantity 120). | TC-API-042 |
+| OBS-2 | Medium | P2 | Race on the address step: the asynchronously pre-filled saved address can overwrite the postcode-lookup values, or the other way round. | page object workaround |
+| OBS-6 | Medium | P2 | A card that **expires this month** is rejected ("must be a date after today"). | manual (7 Nov) |
+| OBS-7 | Medium | P2 | Registration accepts **invalid email addresses** (`qa x@exa mple`, no `@`). | manual (7 Nov) |
+| OBS-3 | Medium | P3 | `POST /payment/check` returns "Payment was successful" for an unknown method (`bitcoin`) and for an empty body. | TC-API-043 |
+| OBS-4 | Medium | P3 | Invalid card data on `POST /invoices` returns **500** instead of 422. | TC-API-044 |
+| OBS-5 | Low | P3 | `billing_postal_code` is required by the API spec but can be omitted (201), which also skips the address check. | TC-API-045 |
+| OBS-8 | Low | P3 | The upper age limit is not enforced as stated: ages 76–80 are accepted although the message says "younger than 75". | manual (7 Nov) |
+| OBS-9 | Low | P3 | A customer who turns 18 today is rejected (off by one day). | manual (7 Nov) |
+| OBS-10 | Low | P3 | Updating the quantity of a product that is not in the cart returns 200 but changes nothing. | manual (7 Nov) |
 
 ---
 
@@ -137,7 +145,7 @@ Full structured reports: `docs/assessment-report.md`.
 - Fewer than 10 dropped iterations.
 - The run aborts if the overall error rate goes above 5%.
 
-The workload model, metrics, threshold reasoning and limitations are explained in `docs/assessment-report.md` §4.
+The workload model, checks and threshold reasoning are explained in `docs/test-cases-and-automation.docx` §3.4.
 
 ---
 

@@ -1,6 +1,293 @@
 {
+    "metrics": {
+        "http_req_duration{name:POST /invoices,phase:peak}": {
+            "p(95)": 400.3949999999999,
+            "p(99)": 421.0097,
+            "max": 424.742,
+            "avg": 341.0450645161291,
+            "min": 274.464,
+            "med": 341.151,
+            "p(90)": 382.862,
+            "thresholds": {
+                "p(95)<1500": false,
+                "p(99)<3000": false
+            }
+        },
+        "http_req_tls_handshaking": {
+            "p(95)": 0,
+            "p(99)": 199.97227999999998,
+            "max": 232.788,
+            "avg": 4.792720316622692,
+            "min": 0,
+            "med": 0,
+            "p(90)": 0
+        },
+        "http_req_failed{name:POST /invoices}": {
+            "passes": 0,
+            "fails": 121,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0
+        },
+        "http_req_duration{name:POST /invoices,phase:normal}": {
+            "avg": 373.09850000000006,
+            "min": 319.943,
+            "med": 355.6225,
+            "p(90)": 428.30030000000005,
+            "p(95)": 486.79895,
+            "p(99)": 495.03235,
+            "max": 496.971,
+            "thresholds": {
+                "p(95)<1000": false,
+                "p(99)<2000": false
+            }
+        },
+        "http_req_connecting": {
+            "avg": 4.748643799472296,
+            "min": 0,
+            "med": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "p(99)": 199.28473999999997,
+            "max": 233.862
+        },
+        "http_req_duration{name:POST /invoices,phase:recovery}": {
+            "p(90)": 381.027,
+            "p(95)": 395.3825,
+            "p(99)": 413.62760000000003,
+            "max": 417.482,
+            "avg": 330.49909677419356,
+            "min": 281.616,
+            "med": 314.688,
+            "thresholds": {
+                "p(95)<1000": false
+            }
+        },
+        "http_req_blocked": {
+            "min": 0,
+            "med": 0.001,
+            "p(90)": 0.002,
+            "p(95)": 0.002,
+            "p(99)": 399.43981999999994,
+            "max": 442.149,
+            "avg": 9.558147757256036
+        },
+        "checks": {
+            "fails": 0,
+            "passes": 609,
+            "thresholds": {
+                "rate>0.99": false
+            },
+            "value": 1
+        },
+        "vus": {
+            "value": 1,
+            "min": 0,
+            "max": 2
+        },
+        "order_success": {
+            "passes": 121,
+            "fails": 0,
+            "thresholds": {
+                "rate>0.99": false
+            },
+            "value": 1
+        },
+        "http_reqs": {
+            "count": 379,
+            "rate": 2.9644725872404
+        },
+        "http_req_sending": {
+            "med": 0.168,
+            "p(90)": 0.224,
+            "p(95)": 0.244,
+            "p(99)": 0.4656599999999997,
+            "max": 2.628,
+            "avg": 0.17736675461741425,
+            "min": 0.054
+        },
+        "iteration_duration": {
+            "med": 865.476709,
+            "p(90)": 1020.762291,
+            "p(95)": 1275.551458,
+            "p(99)": 1658.580075,
+            "max": 1685.612708,
+            "avg": 904.7256188347109,
+            "min": 728.765
+        },
+        "order_flow_duration": {
+            "p(90)": 995,
+            "p(95)": 1048,
+            "p(99)": 1307.8,
+            "max": 1346,
+            "avg": 879.0330578512396,
+            "min": 729,
+            "med": 864,
+            "thresholds": {
+                "p(95)<3000": false
+            }
+        },
+        "http_req_duration{name:POST /invoices,phase:ramp_up}": {
+            "p(99)": 550.63208,
+            "max": 551.063,
+            "avg": 394.96324137931043,
+            "min": 313.685,
+            "med": 378.397,
+            "p(90)": 483.3036,
+            "p(95)": 527.6655999999999,
+            "thresholds": {
+                "p(95)<1500": false
+            }
+        },
+        "http_req_duration{flow:cart}": {
+            "p(90)": 298.769,
+            "p(95)": 328.0603,
+            "p(99)": 383.04446999999993,
+            "max": 453.778,
+            "avg": 253.15930991735542,
+            "min": 196.989,
+            "med": 245.558,
+            "thresholds": {
+                "p(95)<800": false
+            }
+        },
+        "http_req_waiting": {
+            "med": 274.185,
+            "p(90)": 388.1876,
+            "p(95)": 440.13969999999983,
+            "p(99)": 544.4562,
+            "max": 1320.099,
+            "avg": 296.6474300791554,
+            "min": 196.829
+        },
+        "data_sent": {
+            "count": 83574,
+            "rate": 653.7014037098395
+        },
+        "group_duration": {
+            "avg": 879.489573396694,
+            "min": 728.607709,
+            "med": 864.321667,
+            "p(90)": 994.920917,
+            "p(95)": 1048.548875,
+            "p(99)": 1307.5862086,
+            "max": 1345.990709
+        },
+        "data_received": {
+            "count": 157329,
+            "rate": 1230.6002841106724
+        },
+        "iterations": {
+            "rate": 0.9464411162429773,
+            "count": 121
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 379,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "http_req_duration{expected_response:true}": {
+            "avg": 297.13218997361486,
+            "min": 196.989,
+            "med": 274.464,
+            "p(90)": 388.6562,
+            "p(95)": 440.3851999999999,
+            "p(99)": 544.8003199999999,
+            "max": 1320.443
+        },
+        "http_req_receiving": {
+            "p(95)": 0.14619999999999997,
+            "p(99)": 6.1835599999999875,
+            "max": 28.83,
+            "avg": 0.3073931398416884,
+            "min": 0.026,
+            "med": 0.083,
+            "p(90)": 0.11320000000000001
+        },
+        "dropped_iterations": {
+            "rate": 0,
+            "count": 0,
+            "thresholds": {
+                "count<10": false
+            }
+        },
+        "orders_created": {
+            "count": 121,
+            "rate": 0.9464411162429773
+        },
+        "vus_max": {
+            "value": 4,
+            "min": 4,
+            "max": 4
+        },
+        "http_req_duration": {
+            "min": 196.989,
+            "med": 274.464,
+            "p(90)": 388.6562,
+            "p(95)": 440.3851999999999,
+            "p(99)": 544.8003199999999,
+            "max": 1320.443,
+            "avg": 297.13218997361486
+        }
+    },
+    "setup_data": {
+        "billing": {
+            "billing_city": "Banholt",
+            "billing_country": "NL",
+            "billing_postal_code": "3511AA",
+            "billing_state": "Gelderland",
+            "billing_street": "Hoppenbrouwerlaan 1"
+        },
+        "price": 12.01,
+        "productId": "01M6V4Z48XWAV8CTBMPBZCAG04",
+        "users": [
+            {
+                "password": "Pf!mw6if6ag0Aa",
+                "email": "perf.mw6if6ag.0@example.com"
+            },
+            {
+                "email": "perf.mw6if6ag.1@example.com",
+                "password": "Pf!mw6if6ag1Aa"
+            },
+            {
+                "password": "Pf!mw6if6ag2Aa",
+                "email": "perf.mw6if6ag.2@example.com"
+            },
+            {
+                "email": "perf.mw6if6ag.3@example.com",
+                "password": "Pf!mw6if6ag3Aa"
+            },
+            {
+                "email": "perf.mw6if6ag.4@example.com",
+                "password": "Pf!mw6if6ag4Aa"
+            },
+            {
+                "email": "perf.mw6if6ag.5@example.com",
+                "password": "Pf!mw6if6ag5Aa"
+            },
+            {
+                "email": "perf.mw6if6ag.6@example.com",
+                "password": "Pf!mw6if6ag6Aa"
+            },
+            {
+                "email": "perf.mw6if6ag.7@example.com",
+                "password": "Pf!mw6if6ag7Aa"
+            },
+            {
+                "email": "perf.mw6if6ag.8@example.com",
+                "password": "Pf!mw6if6ag8Aa"
+            },
+            {
+                "email": "perf.mw6if6ag.9@example.com",
+                "password": "Pf!mw6if6ag9Aa"
+            }
+        ]
+    },
     "root_group": {
-        "name": "",
         "path": "",
         "id": "d41d8cd98f00b204e9800998ecf8427e",
         "groups": {
@@ -14,35 +301,35 @@
                             "name": "cart created 201",
                             "path": "::order::cart created 201",
                             "id": "7ccd1d67a4e33734d8bbb72d1c5586bb",
-                            "passes": 119,
+                            "passes": 121,
                             "fails": 0
                         },
                         "item added 200": {
+                            "name": "item added 200",
                             "path": "::order::item added 200",
                             "id": "dbf2c74cfdcc8027db43affb972b5794",
-                            "passes": 119,
-                            "fails": 0,
-                            "name": "item added 200"
-                        },
-                        "order created 201": {
-                            "name": "order created 201",
-                            "path": "::order::order created 201",
-                            "id": "7036fb22d21a96104276767921987a4a",
-                            "passes": 119,
+                            "passes": 121,
                             "fails": 0
                         },
+                        "order created 201": {
+                            "path": "::order::order created 201",
+                            "id": "7036fb22d21a96104276767921987a4a",
+                            "passes": 121,
+                            "fails": 0,
+                            "name": "order created 201"
+                        },
                         "invoice number issued": {
+                            "fails": 0,
+                            "name": "invoice number issued",
                             "path": "::order::invoice number issued",
                             "id": "343bb465118166bb168975c0b2ee0e0e",
-                            "passes": 119,
-                            "fails": 0,
-                            "name": "invoice number issued"
+                            "passes": 121
                         },
                         "order total = price": {
                             "name": "order total = price",
                             "path": "::order::order total = price",
                             "id": "5e65fd95d90e1e8c1fd97881089cf819",
-                            "passes": 119,
+                            "passes": 121,
                             "fails": 0
                         }
                     }
@@ -50,300 +337,13 @@
         },
         "checks": {
             "login 200": {
-                "passes": 6,
-                "fails": 0,
                 "name": "login 200",
                 "path": "::login 200",
-                "id": "48b06dc5cde7f6ebb606ad7da726a2a5"
-            }
-        }
-    },
-    "metrics": {
-        "http_req_receiving": {
-            "p(95)": 0.17229999999999998,
-            "p(99)": 0.3965199999999988,
-            "max": 9.889,
-            "avg": 0.14919466666666664,
-            "min": 0.024,
-            "med": 0.105,
-            "p(90)": 0.13560000000000003
-        },
-        "iterations": {
-            "count": 119,
-            "rate": 0.9355160279681243
-        },
-        "checks": {
-            "passes": 601,
-            "fails": 0,
-            "thresholds": {
-                "rate>0.99": false
-            },
-            "value": 1
-        },
-        "http_req_tls_handshaking": {
-            "avg": 16.786213333333333,
-            "min": 0,
-            "med": 0,
-            "p(90)": 0,
-            "p(95)": 0,
-            "p(99)": 267.1887599999999,
-            "max": 1913.137
-        },
-        "data_sent": {
-            "count": 87091,
-            "rate": 684.6640873258144
-        },
-        "iteration_duration": {
-            "p(90)": 1504.723175,
-            "p(95)": 2040.3835747,
-            "p(99)": 3229.5112893199994,
-            "max": 4726.649584,
-            "avg": 1084.1716964285713,
-            "min": 721.138584,
-            "med": 922.17975
-        },
-        "vus_max": {
-            "value": 6,
-            "min": 4,
-            "max": 6
-        },
-        "http_req_duration{name:POST /invoices,phase:recovery}": {
-            "min": 309.534,
-            "med": 368.306,
-            "p(90)": 451.234,
-            "p(95)": 511.87299999999993,
-            "p(99)": 572.53,
-            "max": 584.824,
-            "avg": 383.1942903225807,
-            "thresholds": {
-                "p(95)<1000": false
+                "id": "48b06dc5cde7f6ebb606ad7da726a2a5",
+                "passes": 4,
+                "fails": 0
             }
         },
-        "http_reqs": {
-            "count": 375,
-            "rate": 2.948054709983585
-        },
-        "group_duration": {
-            "max": 2690.001625,
-            "avg": 1013.0713460084032,
-            "min": 721.00375,
-            "med": 910.254375,
-            "p(90)": 1269.0166418,
-            "p(95)": 1565.1483671999997,
-            "p(99)": 2506.3167925
-        },
-        "http_req_failed{name:POST /invoices}": {
-            "passes": 0,
-            "fails": 119,
-            "thresholds": {
-                "rate<0.01": false
-            },
-            "value": 0
-        },
-        "http_req_duration{name:POST /invoices,phase:ramp_up}": {
-            "avg": 354.76955172413795,
-            "min": 294.354,
-            "med": 338.462,
-            "p(90)": 437.064,
-            "p(95)": 470.18379999999996,
-            "p(99)": 489.34324,
-            "max": 490.685,
-            "thresholds": {
-                "p(95)<1500": false
-            }
-        },
-        "orders_created": {
-            "count": 119,
-            "rate": 0.9355160279681243
-        },
-        "http_req_duration{name:POST /invoices,phase:peak}": {
-            "avg": 519.66225,
-            "min": 329.033,
-            "med": 491.20550000000003,
-            "p(90)": 754.8185000000001,
-            "p(95)": 809.22665,
-            "p(99)": 839.6990199999999,
-            "max": 849.574,
-            "thresholds": {
-                "p(95)<1500": false,
-                "p(99)<3000": false
-            }
-        },
-        "http_req_duration{expected_response:true}": {
-            "avg": 336.96662666666657,
-            "min": 196.116,
-            "med": 298.519,
-            "p(90)": 495.09360000000004,
-            "p(95)": 574.3103,
-            "p(99)": 941.1310999999995,
-            "max": 1269.374
-        },
-        "http_req_duration{flow:cart}": {
-            "p(90)": 348.6209,
-            "p(95)": 472.6900999999997,
-            "p(99)": 982.8892999999996,
-            "max": 1269.374,
-            "avg": 288.3448361344538,
-            "min": 196.116,
-            "med": 250.829,
-            "thresholds": {
-                "p(95)<800": false
-            }
-        },
-        "http_req_blocked": {
-            "min": 0,
-            "med": 0.001,
-            "p(90)": 0.002,
-            "p(95)": 0.002,
-            "p(99)": 521.3819999999993,
-            "max": 2156.601,
-            "avg": 23.198226666666823
-        },
-        "order_flow_duration": {
-            "min": 721,
-            "med": 911,
-            "p(90)": 1269.2,
-            "p(95)": 1565.3,
-            "p(99)": 2506.12,
-            "max": 2690,
-            "avg": 1013.0840336134454,
-            "thresholds": {
-                "p(95)<3000": false
-            }
-        },
-        "http_req_sending": {
-            "p(90)": 0.2606,
-            "p(95)": 0.288,
-            "p(99)": 0.4382399999999994,
-            "max": 4.403,
-            "avg": 0.2355466666666666,
-            "min": 0.058,
-            "med": 0.218
-        },
-        "data_received": {
-            "count": 168064,
-            "rate": 1321.23164474315
-        },
-        "http_req_duration": {
-            "med": 298.519,
-            "p(90)": 495.09360000000004,
-            "p(95)": 574.3103,
-            "p(99)": 941.1310999999995,
-            "max": 1269.374,
-            "avg": 336.96662666666657,
-            "min": 196.116
-        },
-        "order_success": {
-            "passes": 119,
-            "fails": 0,
-            "thresholds": {
-                "rate>0.99": false
-            },
-            "value": 1
-        },
-        "http_req_duration{name:POST /invoices,phase:normal}": {
-            "avg": 388.6389032258064,
-            "min": 297.527,
-            "med": 376.458,
-            "p(90)": 472.371,
-            "p(95)": 515.7824999999999,
-            "p(99)": 542.1164,
-            "max": 552.008,
-            "thresholds": {
-                "p(95)<1000": false,
-                "p(99)<2000": false
-            }
-        },
-        "vus": {
-            "value": 1,
-            "min": 0,
-            "max": 3
-        },
-        "dropped_iterations": {
-            "count": 2,
-            "rate": 0.015722958453245787,
-            "thresholds": {
-                "count<10": false
-            }
-        },
-        "http_req_waiting": {
-            "p(99)": 940.8158399999995,
-            "max": 1269.074,
-            "avg": 336.58188533333316,
-            "min": 195.809,
-            "med": 298.195,
-            "p(90)": 494.84200000000004,
-            "p(95)": 573.9798999999999
-        },
-        "http_req_failed": {
-            "passes": 0,
-            "fails": 375,
-            "thresholds": {
-                "rate<0.05": false
-            },
-            "value": 0
-        },
-        "http_req_connecting": {
-            "max": 486.06,
-            "avg": 6.384445333333335,
-            "min": 0,
-            "med": 0,
-            "p(90)": 0,
-            "p(95)": 0,
-            "p(99)": 183.41091999999998
-        }
-    },
-    "setup_data": {
-        "users": [
-            {
-                "email": "perf.mw4xeuer.0@example.com",
-                "password": "Pf!mw4xeuer0Aa"
-            },
-            {
-                "email": "perf.mw4xeuer.1@example.com",
-                "password": "Pf!mw4xeuer1Aa"
-            },
-            {
-                "email": "perf.mw4xeuer.2@example.com",
-                "password": "Pf!mw4xeuer2Aa"
-            },
-            {
-                "password": "Pf!mw4xeuer3Aa",
-                "email": "perf.mw4xeuer.3@example.com"
-            },
-            {
-                "email": "perf.mw4xeuer.4@example.com",
-                "password": "Pf!mw4xeuer4Aa"
-            },
-            {
-                "email": "perf.mw4xeuer.5@example.com",
-                "password": "Pf!mw4xeuer5Aa"
-            },
-            {
-                "email": "perf.mw4xeuer.6@example.com",
-                "password": "Pf!mw4xeuer6Aa"
-            },
-            {
-                "email": "perf.mw4xeuer.7@example.com",
-                "password": "Pf!mw4xeuer7Aa"
-            },
-            {
-                "email": "perf.mw4xeuer.8@example.com",
-                "password": "Pf!mw4xeuer8Aa"
-            },
-            {
-                "email": "perf.mw4xeuer.9@example.com",
-                "password": "Pf!mw4xeuer9Aa"
-            }
-        ],
-        "billing": {
-            "billing_city": "Banholt",
-            "billing_country": "NL",
-            "billing_postal_code": "3511AA",
-            "billing_state": "Gelderland",
-            "billing_street": "Hoppenbrouwerlaan 1"
-        },
-        "price": 14.15,
-        "productId": "01M6RBQ65VW3QDS4A8TJ2XE4J2"
+        "name": ""
     }
 }
