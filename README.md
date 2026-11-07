@@ -8,6 +8,7 @@ Test automation for the public demo **[Practice Software Testing – Toolshop](h
 | Postman collection (+ last run result) | `postman/toolshop-api.postman_collection.json`, `postman/results/` |
 | k6 performance script (+ smoke result) | `perf/checkout-load.js`, `perf/results/` |
 | Test cases, defect reports, API & performance write-up | `docs/assessment-report.md` |
+| Full test case catalogue, automated tests and why, automation explained | `docs/test-cases-and-automation.md` (Word: `.docx`) |
 | Every run command on one page | [`RUN_COMMANDS.md`](RUN_COMMANDS.md) |
 
 ---
