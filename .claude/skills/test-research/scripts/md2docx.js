@@ -1,4 +1,4 @@
-// Minimal Markdown → DOCX converter for docs/test-cases-and-automation.md
+// Minimal Markdown → DOCX converter for docs/test-cases-and-automation.md (whole document or a section fragment)
 // Usage: node md2docx.js <in.md> <out.docx>
 const fs = require('fs');
 const {
@@ -9,6 +9,12 @@ const {
 
 const [, , inPath, outPath] = process.argv;
 const lines = fs.readFileSync(inPath, 'utf8').split('\n');
+// Title and footer come from the document's first "# " line (a full document); fragments without one
+// keep the original Toolshop defaults (their footer is never used: only the body is spliced in).
+const h1 = lines.find((l) => /^# /.test(l));
+const DOC_TITLE = h1 ? h1.slice(2).trim() : 'Test Cases & Automation Guide – Practice Software Testing (Toolshop)';
+const FOOTER = (h1 ? DOC_TITLE : 'Toolshop – Test Cases & Automation Guide') + '   ·   Page ';
+const AUTHOR = process.env.DOC_AUTHOR || 'Kamal Hasan';
 
 const FONT = 'Calibri';
 const MONO = 'Consolas';
@@ -154,8 +160,8 @@ while (i < lines.length) {
 }
 
 const doc = new Document({
-  creator: 'Kamal Hasan',
-  title: 'Test Cases & Automation Guide – Practice Software Testing (Toolshop)',
+  creator: AUTHOR,
+  title: DOC_TITLE,
   styles: {
     default: { document: { run: { font: FONT, size: 20 }, paragraph: { spacing: { after: 100, line: 276 } } } },
     paragraphStyles: [
@@ -186,7 +192,7 @@ const doc = new Document({
       default: new Footer({ children: [new Paragraph({
         alignment: AlignmentType.RIGHT,
         children: [
-          new TextRun({ text: 'Toolshop – Test Cases & Automation Guide   ·   Page ', size: 16, color: '808080' }),
+          new TextRun({ text: FOOTER, size: 16, color: '808080' }),
           new TextRun({ children: [PageNumber.CURRENT], size: 16, color: '808080' }),
         ],
       })] }),
