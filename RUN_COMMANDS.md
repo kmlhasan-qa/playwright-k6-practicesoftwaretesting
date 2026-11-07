@@ -71,6 +71,19 @@ k6 run -e PROFILE=load -e API_URL=https://your-test-env perf/checkout-load.js   
 k6 run -e USER_POOL=20 perf/checkout-load.js                                       # larger pool of test users
 ```
 
+Run one phase on its own (load-profile rates, starts at t=0, only that phase's latency thresholds):
+
+```bash
+npm run perf:normal         # normal expected traffic – 5 orders/s for 5 min
+npm run perf:ramp           # gradual increase – ramps 5 → 20 orders/s over 5 min
+npm run perf:peak           # peak traffic – 20 orders/s for 5 min
+k6 run -e PROFILE=load -e PHASE=recovery perf/checkout-load.js                     # recovery – 5 orders/s for 3 min
+k6 run -e PROFILE=load -e PHASE=peak -e API_URL=https://your-test-env perf/checkout-load.js   # one phase against your own environment
+k6 run -e PHASE=peak perf/checkout-load.js                                         # quick dry run of one phase at smoke rate (1/s, 30 s)
+```
+
+Like `perf:load`, the per-phase npm scripts use load rates – run them **only against an environment you own**.
+
 Summaries are written to `perf/results/*-summary.json`. The k6 exit code is non-zero if any threshold fails.
 
 ## 7. Reports and debugging

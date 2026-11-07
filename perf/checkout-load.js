@@ -15,8 +15,14 @@
  *   load             – the full model: normal 5/s → ramp to 20/s → peak 20/s → recovery.
  *                      Run ONLY against an environment you own (see README "Limitations").
  *
+ * Phase selection (env PHASE):
+ *   all (default)    – normal → ramp_up → peak → recovery in one run.
+ *   normal | ramp_up | peak | recovery – run just that phase, starting at t=0, with only
+ *                      its own latency thresholds (the global ones still apply).
+ *
  *   k6 run perf/checkout-load.js
  *   k6 run -e PROFILE=load -e API_URL=https://my-test-env perf/checkout-load.js
+ *   k6 run -e PROFILE=load -e PHASE=peak perf/checkout-load.js
  */
 import http from 'k6/http';
 import { check, fail, group } from 'k6';
@@ -25,6 +31,7 @@ import exec from 'k6/execution';
 
 const API = __ENV.API_URL || 'https://api.practicesoftwaretesting.com';
 const PROFILE = (__ENV.PROFILE || 'smoke').toLowerCase();
+const PHASE = (__ENV.PHASE || 'all').toLowerCase();
 const USER_POOL = Number(__ENV.USER_POOL || 10);
 const TOKEN_TTL_MS = 240 * 1000; // API tokens expire after 300 s – refresh with margin.
 
@@ -49,33 +56,54 @@ const at = (...ds) => `${ds.reduce((s, d) => s + secs(d), 0)}s`;
 // peak, 20/s needs ~40 VUs; preAllocate that and allow headroom up to maxVUs.
 const vus = (rate) => ({ preAllocatedVUs: Math.max(2, Math.ceil(rate * 2)), maxVUs: p.maxVUs });
 
-export const options = {
-  scenarios: {
-    normal: {
-      executor: 'constant-arrival-rate',
-      rate: p.normal, timeUnit: '1s', duration: p.normalFor,
-      ...vus(p.normal), tags: { phase: 'normal' },
-    },
-    ramp_up: {
-      executor: 'ramping-arrival-rate',
-      startRate: p.normal, timeUnit: '1s',
-      stages: [{ target: p.peak, duration: p.rampFor }],
-      startTime: at(p.normalFor),
-      ...vus(p.peak), tags: { phase: 'ramp_up' },
-    },
-    peak: {
-      executor: 'constant-arrival-rate',
-      rate: p.peak, timeUnit: '1s', duration: p.peakFor,
-      startTime: at(p.normalFor, p.rampFor),
-      ...vus(p.peak), tags: { phase: 'peak' },
-    },
-    recovery: {
-      executor: 'constant-arrival-rate',
-      rate: p.normal, timeUnit: '1s', duration: p.recoveryFor,
-      startTime: at(p.normalFor, p.rampFor, p.peakFor),
-      ...vus(p.normal), tags: { phase: 'recovery' },
-    },
+const ALL_SCENARIOS = {
+  normal: {
+    executor: 'constant-arrival-rate',
+    rate: p.normal, timeUnit: '1s', duration: p.normalFor,
+    ...vus(p.normal), tags: { phase: 'normal' },
   },
+  ramp_up: {
+    executor: 'ramping-arrival-rate',
+    startRate: p.normal, timeUnit: '1s',
+    stages: [{ target: p.peak, duration: p.rampFor }],
+    startTime: at(p.normalFor),
+    ...vus(p.peak), tags: { phase: 'ramp_up' },
+  },
+  peak: {
+    executor: 'constant-arrival-rate',
+    rate: p.peak, timeUnit: '1s', duration: p.peakFor,
+    startTime: at(p.normalFor, p.rampFor),
+    ...vus(p.peak), tags: { phase: 'peak' },
+  },
+  recovery: {
+    executor: 'constant-arrival-rate',
+    rate: p.normal, timeUnit: '1s', duration: p.recoveryFor,
+    startTime: at(p.normalFor, p.rampFor, p.peakFor),
+    ...vus(p.normal), tags: { phase: 'recovery' },
+  },
+};
+
+// PHASE=all keeps the full sequence; a single phase runs alone from t=0.
+if (PHASE !== 'all' && !ALL_SCENARIOS[PHASE]) {
+  throw new Error(`Unknown PHASE "${PHASE}" (use all | ${Object.keys(ALL_SCENARIOS).join(' | ')})`);
+}
+const scenarios = PHASE === 'all'
+  ? ALL_SCENARIOS
+  : { [PHASE]: { ...ALL_SCENARIOS[PHASE], startTime: '0s' } };
+
+// Latency thresholds per phase (booking call). Baseline from smoke runs: p95 ≈ 0.75–0.85 s.
+const PHASE_THRESHOLDS = {
+  normal: ['p(95)<1000', 'p(99)<2000'],
+  ramp_up: ['p(95)<1500'],
+  peak: ['p(95)<1500', 'p(99)<3000'],
+  recovery: ['p(95)<1000'],
+};
+const phaseThresholds = Object.fromEntries(
+  Object.keys(scenarios).map((ph) => [`http_req_duration{name:POST /invoices,phase:${ph}}`, PHASE_THRESHOLDS[ph]]),
+);
+
+export const options = {
+  scenarios,
 
   thresholds: {
     // Correctness first: almost every order must succeed, in every phase.
@@ -85,11 +113,8 @@ export const options = {
     'http_req_failed': [{ threshold: 'rate<0.05', abortOnFail: true, delayAbortEval: '30s' }],
     'http_req_failed{name:POST /invoices}': ['rate<0.01'],
 
-    // Latency of the booking call, per phase. Baseline from smoke runs: p95 ≈ 0.75–0.85 s.
-    'http_req_duration{name:POST /invoices,phase:normal}': ['p(95)<1000', 'p(99)<2000'],
-    'http_req_duration{name:POST /invoices,phase:ramp_up}': ['p(95)<1500'],
-    'http_req_duration{name:POST /invoices,phase:peak}': ['p(95)<1500', 'p(99)<3000'],
-    'http_req_duration{name:POST /invoices,phase:recovery}': ['p(95)<1000'],
+    // Latency of the booking call, only for the phase(s) in this run.
+    ...phaseThresholds,
     // Supporting cart calls are simpler and should stay fast.
     'http_req_duration{flow:cart}': ['p(95)<800'],
     // Whole order as the customer experiences it.

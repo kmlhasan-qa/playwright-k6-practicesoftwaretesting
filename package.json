@@ -15,6 +15,9 @@
     "test:postman": "newman run postman/toolshop-api.postman_collection.json --reporters cli,junit --reporter-junit-export postman/results/newman-junit.xml",
     "perf:smoke": "k6 run --summary-export perf/results/smoke-summary.json perf/checkout-load.js",
     "perf:load": "k6 run -e PROFILE=load --summary-export perf/results/load-summary.json perf/checkout-load.js",
+    "perf:normal": "k6 run -e PROFILE=load -e PHASE=normal --summary-export perf/results/normal-summary.json perf/checkout-load.js",
+    "perf:ramp": "k6 run -e PROFILE=load -e PHASE=ramp_up --summary-export perf/results/ramp-summary.json perf/checkout-load.js",
+    "perf:peak": "k6 run -e PROFILE=load -e PHASE=peak --summary-export perf/results/peak-summary.json perf/checkout-load.js",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit"
   },

@@ -34,11 +34,12 @@ cp .env.example .env        # optional – every value has a default
 | `npm run test:postman` | Postman collection via newman |
 | `npm run perf:smoke` | k6 smoke profile (safe for the public demo) |
 | `npm run perf:load` | full k6 load model – **only against an environment you own** |
+| `npm run perf:normal` / `perf:ramp` / `perf:peak` | one load phase on its own (normal 5/s, ramp 5→20/s, peak 20/s) – **only against an environment you own** |
 | `npm run report` | open the last HTML report |
 
 See [`RUN_COMMANDS.md`](RUN_COMMANDS.md) for the full list.
 
-Environment variables (`.env` or shell): `BASE_URL`, `API_URL`, `HEADLESS`, `CUSTOMER_EMAIL`, `CUSTOMER_PASSWORD`. The k6 script takes `PROFILE`, `API_URL` and `USER_POOL`.
+Environment variables (`.env` or shell): `BASE_URL`, `API_URL`, `HEADLESS`, `CUSTOMER_EMAIL`, `CUSTOMER_PASSWORD`. The k6 script takes `PROFILE`, `PHASE` (`all` \| `normal` \| `ramp_up` \| `peak` \| `recovery`), `API_URL` and `USER_POOL`.
 
 **CI:** `.github/workflows/playwright.yml` runs the `api` and `ui` projects plus the Postman collection on every push, every PR and nightly, and uploads the reports. The k6 smoke run is manual only (workflow_dispatch), so the public demo never gets automatic load.
 
