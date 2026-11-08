@@ -116,7 +116,7 @@ cp .env.example .env        # optional – every value has a default
 | `npm run test:postman` | Postman collection via newman |
 | `npm run perf:smoke` | k6 smoke profile (safe for the public demo) |
 | `npm run perf:load` | full k6 load model – **only against an environment you own** |
-| `npm run perf:normal` / `perf:ramp` / `perf:peak` | one load phase on its own (normal 5/s, ramp 5→20/s, peak 20/s) – **only against an environment you own** |
+| `npm run perf:normal` / `perf:ramp` / `perf:peak` / `perf:recovery` | one load phase on its own (normal 5/s, ramp 5→20/s, peak 20/s, recovery 5/s) – **only against an environment you own** |
 | `npm run report` | open the last HTML report |
 
 See [`RUN_COMMANDS.md`](RUN_COMMANDS.md) for the full list.
@@ -129,7 +129,8 @@ Environment variables (`.env` or shell): `BASE_URL`, `API_URL`, `HEADLESS`, `CUS
 - Playwright UI: 3 passed (TC-UI-001, TC-UI-002; TC-UI-003 is the DEF-001 test and fails as expected).
 - Playwright API: 52 passed (37 functional tests; the other 15 are known-defect tests that fail as expected).
 - newman: 33 requests, 56/56 assertions passed.
-- k6 smoke: every threshold passed; 121 of 121 orders with 0% errors and 0 dropped iterations. Booking p95: normal 356 ms, ramp 380 ms, peak 387 ms, recovery 357 ms.
+- k6 smoke (public demo, 19:55): every threshold passed; 123 of 123 orders with 0% errors and 0 dropped iterations. Booking p95: normal 361 ms, ramp 439 ms, peak 376 ms, recovery 344 ms.
+- k6 load / single phases: not run (they need an environment you own). Run history: `perf/results/history.jsonl`.
 
 ---
 

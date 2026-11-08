@@ -18,6 +18,7 @@
     "perf:normal": "k6 run -e PROFILE=load -e PHASE=normal --summary-export perf/results/normal-summary.json perf/checkout-load.js",
     "perf:ramp": "k6 run -e PROFILE=load -e PHASE=ramp_up --summary-export perf/results/ramp-summary.json perf/checkout-load.js",
     "perf:peak": "k6 run -e PROFILE=load -e PHASE=peak --summary-export perf/results/peak-summary.json perf/checkout-load.js",
+    "perf:recovery": "k6 run -e PROFILE=load -e PHASE=recovery --summary-export perf/results/recovery-summary.json perf/checkout-load.js",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit"
   },
