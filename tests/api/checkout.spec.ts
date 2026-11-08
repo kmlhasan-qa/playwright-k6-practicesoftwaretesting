@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures';
-import { CREDIT_CARD } from '../../helpers/data.factory';
+import { CREDIT_CARD, newCustomer } from '../../helpers/data.factory';
 
 test.describe('Checkout: payment & invoice @api', () => {
   test('TC-API-030 | Customer places an order; invoice total and lines match the cart', async ({ api, customer }) => {
@@ -86,5 +86,68 @@ test.describe('Checkout: payment & invoice @api', () => {
       'payment_details.gift_card_number',
       'payment_details.validation_code',
     ]);
+  });
+
+  // Other payment methods share the order path with credit card / COD (PAY-09, PAY-10, PAY-12).
+  const otherMethods = [
+    { method: 'gift-card', details: { gift_card_number: '1234567890123456', validation_code: '1234' }, id: 'PAY-09' },
+    { method: 'bank-transfer', details: { bank_name: 'Qa Bank', account_name: 'Qa Automation', account_number: '123456789' }, id: 'PAY-10' },
+    { method: 'buy-now-pay-later', details: { monthly_installments: '3' }, id: 'PAY-12' },
+  ];
+  for (const { method, details, id } of otherMethods) {
+    test(`TC-API-037 | ${id} Order paid by ${method} is accepted and stored with that method`, async ({ api, customer }) => {
+      const product = await api.purchasableProduct();
+      const cartId = await api.cartWith(product.id);
+      const payment = { payment_method: method, payment_details: details };
+
+      const check = await api.checkPayment(payment);
+      expect(check.status(), await check.text()).toBe(200);
+
+      const res = await customer.api.createInvoice({ ...(await api.validBillingAddress()), ...payment, cart_id: cartId });
+      expect(res.status(), await res.text()).toBe(201);
+      const detail = await (await customer.api.getInvoice((await res.json()).id)).json();
+      expect(detail.payment).toMatchObject({ payment_method: method });
+      expect(detail.total).toBe(product.price);
+    });
+  }
+
+  test('TC-API-038 | ORD-09 A customer cannot read another customer\'s invoice', async ({ api, customer }) => {
+    const product = await api.purchasableProduct();
+    const cartId = await api.cartWith(product.id);
+    const res = await customer.api.createInvoice({
+      ...(await api.validBillingAddress()),
+      payment_method: 'cash-on-delivery',
+      payment_details: {},
+      cart_id: cartId,
+    });
+    expect(res.status()).toBe(201);
+    const invoiceId = (await res.json()).id;
+
+    const other = newCustomer();
+    expect((await api.register(other)).status()).toBe(201);
+    const otherApi = api.withToken(await api.loginOrFail(other.email, other.password));
+
+    const peek = await otherApi.getInvoice(invoiceId);
+    expect([403, 404], `customer B reading A's invoice → ${peek.status()}`).toContain(peek.status());
+    expect(await peek.text()).not.toContain(customer.email);
+    expect((await (await otherApi.listInvoices()).json()).data).toEqual([]);
+  });
+
+  test('TC-API-039 | Total, subtotal and status sent by the client are ignored when placing an order', async ({ api, customer }) => {
+    const product = await api.purchasableProduct();
+    const cartId = await api.cartWith(product.id);
+    const res = await customer.api.createInvoice({
+      ...(await api.validBillingAddress()),
+      payment_method: 'cash-on-delivery',
+      payment_details: {},
+      cart_id: cartId,
+      total: 0.01,
+      subtotal: 0.01,
+      status: 'COMPLETED',
+    });
+    expect(res.status()).toBe(201);
+    const detail = await (await customer.api.getInvoice((await res.json()).id)).json();
+    expect(detail).toMatchObject({ total: product.price, status: 'AWAITING_FULFILLMENT' });
+    expect(detail.invoicelines).toEqual([expect.objectContaining({ quantity: 1, unit_price: product.price })]);
   });
 });

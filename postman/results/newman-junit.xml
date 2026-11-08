@@ -1,125 +1,125 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="Toolshop API – checkout workflow" tests="33" time="24.573">
-  <testsuite name="1. Users &amp; auth / TC-API-004a Register new customer" id="86bba746-d9e3-4c84-87bf-fc54242ea210" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.991">
-    <testcase name="Status is 201" time="0.991" classname="1UsersAmpAuthTcApi004ARegisterNewCustomer"/>
-    <testcase name="Returns the created customer without password" time="0.991" classname="1UsersAmpAuthTcApi004ARegisterNewCustomer"/>
+<testsuites name="Toolshop API – checkout workflow" tests="33" time="21.696">
+  <testsuite name="1. Users &amp; auth / TC-API-004a Register new customer" id="b0aeb35e-6730-451e-944d-cc2dce9c09e0" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.938">
+    <testcase name="Status is 201" time="0.938" classname="1UsersAmpAuthTcApi004ARegisterNewCustomer"/>
+    <testcase name="Returns the created customer without password" time="0.938" classname="1UsersAmpAuthTcApi004ARegisterNewCustomer"/>
   </testsuite>
-  <testsuite name="1. Users &amp; auth / TC-API-004b Register same email again" id="69798f6b-187a-48e0-b8db-ef32af7587de" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.788">
-    <testcase name="Status is 409" time="0.788" classname="1UsersAmpAuthTcApi004BRegisterSameEmailAgain"/>
-    <testcase name="Explains the duplicate email" time="0.788" classname="1UsersAmpAuthTcApi004BRegisterSameEmailAgain"/>
+  <testsuite name="1. Users &amp; auth / TC-API-004b Register same email again" id="b7fc4f8c-37c4-437a-85fc-fdbe6556ecb1" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="1.303">
+    <testcase name="Status is 409" time="1.303" classname="1UsersAmpAuthTcApi004BRegisterSameEmailAgain"/>
+    <testcase name="Explains the duplicate email" time="1.303" classname="1UsersAmpAuthTcApi004BRegisterSameEmailAgain"/>
   </testsuite>
-  <testsuite name="1. Users &amp; auth / TC-API-005 Register with weak password" id="c6bcfbe7-a8bf-4e73-8553-5132b6d95886" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.947">
-    <testcase name="Status is 422" time="0.947" classname="1UsersAmpAuthTcApi005RegisterWithWeakPassword"/>
-    <testcase name="Password rule message" time="0.947" classname="1UsersAmpAuthTcApi005RegisterWithWeakPassword"/>
+  <testsuite name="1. Users &amp; auth / TC-API-005 Register with weak password" id="590b394a-8a7f-4954-b8c0-14fc1bb23989" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.723">
+    <testcase name="Status is 422" time="0.723" classname="1UsersAmpAuthTcApi005RegisterWithWeakPassword"/>
+    <testcase name="Password rule message" time="0.723" classname="1UsersAmpAuthTcApi005RegisterWithWeakPassword"/>
   </testsuite>
-  <testsuite name="1. Users &amp; auth / TC-API-002 Login with wrong password" id="b3572605-22f8-4e59-a848-ae9a12650846" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="1.072">
-    <testcase name="Status is 401" time="1.072" classname="1UsersAmpAuthTcApi002LoginWithWrongPassword"/>
+  <testsuite name="1. Users &amp; auth / TC-API-002 Login with wrong password" id="9649ac27-634e-4897-87d4-11c661fd17ea" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.725">
+    <testcase name="Status is 401" time="0.725" classname="1UsersAmpAuthTcApi002LoginWithWrongPassword"/>
   </testsuite>
-  <testsuite name="1. Users &amp; auth / TC-API-001 Login" id="f58f5d45-501d-4076-b02a-5d4b322b854d" timestamp="2026-11-06T12:08:09.844Z" tests="3" failures="0" errors="0" time="0.695">
-    <testcase name="Status is 200" time="0.695" classname="1UsersAmpAuthTcApi001Login"/>
-    <testcase name="Returns a bearer token" time="0.695" classname="1UsersAmpAuthTcApi001Login"/>
-    <testcase name="Response time &lt; 5000 ms (sanity guard; performance is covered by k6)" time="0.695" classname="1UsersAmpAuthTcApi001Login"/>
+  <testsuite name="1. Users &amp; auth / TC-API-001 Login" id="b8939dba-5d5c-4d87-b933-ea8326fe2568" timestamp="2026-11-08T12:27:15.155Z" tests="3" failures="0" errors="0" time="0.687">
+    <testcase name="Status is 200" time="0.687" classname="1UsersAmpAuthTcApi001Login"/>
+    <testcase name="Returns a bearer token" time="0.687" classname="1UsersAmpAuthTcApi001Login"/>
+    <testcase name="Response time &lt; 5000 ms (sanity guard; performance is covered by k6)" time="0.687" classname="1UsersAmpAuthTcApi001Login"/>
   </testsuite>
-  <testsuite name="1. Users &amp; auth / TC-API-001b Get own profile" id="ce2b3eab-a820-4987-b2b0-01ae64a87b7a" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.598">
-    <testcase name="Status is 200" time="0.598" classname="1UsersAmpAuthTcApi001BGetOwnProfile"/>
-    <testcase name="Profile belongs to the logged-in customer" time="0.598" classname="1UsersAmpAuthTcApi001BGetOwnProfile"/>
+  <testsuite name="1. Users &amp; auth / TC-API-001b Get own profile" id="8f7f19a7-dc07-4716-8547-d5b37910a5f8" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.622">
+    <testcase name="Status is 200" time="0.622" classname="1UsersAmpAuthTcApi001BGetOwnProfile"/>
+    <testcase name="Profile belongs to the logged-in customer" time="0.622" classname="1UsersAmpAuthTcApi001BGetOwnProfile"/>
   </testsuite>
-  <testsuite name="1. Users &amp; auth / TC-API-003 Get profile without token" id="aa8950de-3fe8-4402-9ff5-fee9ddfd9986" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="1.200">
-    <testcase name="Status is 401" time="1.200" classname="1UsersAmpAuthTcApi003GetProfileWithoutToken"/>
+  <testsuite name="1. Users &amp; auth / TC-API-003 Get profile without token" id="c0e0b0fd-f152-4b5c-a2fe-036929f3e1b8" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.569">
+    <testcase name="Status is 401" time="0.569" classname="1UsersAmpAuthTcApi003GetProfileWithoutToken"/>
   </testsuite>
-  <testsuite name="2. Products / TC-API-010 List products" id="87381510-de0f-4d45-ac96-c0f8b3f95e62" timestamp="2026-11-06T12:08:09.844Z" tests="3" failures="0" errors="0" time="0.698">
-    <testcase name="Status is 200" time="0.698" classname="2ProductsTcApi010ListProducts"/>
-    <testcase name="Paginated contract" time="0.698" classname="2ProductsTcApi010ListProducts"/>
-    <testcase name="A purchasable product exists" time="0.698" classname="2ProductsTcApi010ListProducts"/>
+  <testsuite name="2. Products / TC-API-010 List products" id="1de6c839-32a0-4b91-9bdd-7c7f984e7b5d" timestamp="2026-11-08T12:27:15.155Z" tests="3" failures="0" errors="0" time="0.587">
+    <testcase name="Status is 200" time="0.587" classname="2ProductsTcApi010ListProducts"/>
+    <testcase name="Paginated contract" time="0.587" classname="2ProductsTcApi010ListProducts"/>
+    <testcase name="A purchasable product exists" time="0.587" classname="2ProductsTcApi010ListProducts"/>
   </testsuite>
-  <testsuite name="2. Products / TC-API-011 Get product by id" id="c1a7a633-ee76-4c00-ab78-1d6610ae4f89" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.580">
-    <testcase name="Status is 200" time="0.580" classname="2ProductsTcApi011GetProductById"/>
-    <testcase name="Same product as in the list" time="0.580" classname="2ProductsTcApi011GetProductById"/>
+  <testsuite name="2. Products / TC-API-011 Get product by id" id="dee97476-e5fc-4506-b44b-7491989ef3fa" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.602">
+    <testcase name="Status is 200" time="0.602" classname="2ProductsTcApi011GetProductById"/>
+    <testcase name="Same product as in the list" time="0.602" classname="2ProductsTcApi011GetProductById"/>
   </testsuite>
-  <testsuite name="2. Products / TC-API-012 Get unknown product" id="12cf25b6-99ef-46b9-aa98-1499b23d8ad8" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.686">
-    <testcase name="Status is 404" time="0.686" classname="2ProductsTcApi012GetUnknownProduct"/>
+  <testsuite name="2. Products / TC-API-012 Get unknown product" id="1dc267b6-ea70-4f5a-9ac0-b1f41fbef0e2" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.623">
+    <testcase name="Status is 404" time="0.623" classname="2ProductsTcApi012GetUnknownProduct"/>
   </testsuite>
-  <testsuite name="2. Products / TC-API-013 Search products" id="69896dc6-1255-4597-afac-4375a433d292" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.648">
-    <testcase name="Status is 200" time="0.648" classname="2ProductsTcApi013SearchProducts"/>
-    <testcase name="Only matching products" time="0.648" classname="2ProductsTcApi013SearchProducts"/>
+  <testsuite name="2. Products / TC-API-013 Search products" id="7f7ae1d0-52dd-4895-ab66-99f3a803a86a" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.578">
+    <testcase name="Status is 200" time="0.578" classname="2ProductsTcApi013SearchProducts"/>
+    <testcase name="Only matching products" time="0.578" classname="2ProductsTcApi013SearchProducts"/>
   </testsuite>
-  <testsuite name="3. Cart / TC-API-020a Create cart" id="e512c454-dca0-4868-a360-6696262ab57e" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.706">
-    <testcase name="Status is 201" time="0.706" classname="3CartTcApi020ACreateCart"/>
+  <testsuite name="3. Cart / TC-API-020a Create cart" id="dbd4a415-3d63-465f-9a91-8e82603be3c2" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.592">
+    <testcase name="Status is 201" time="0.592" classname="3CartTcApi020ACreateCart"/>
   </testsuite>
-  <testsuite name="3. Cart / TC-API-020b Add 2 units" id="0b89bd22-ae38-4bda-948c-d1e686adb393" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.707">
-    <testcase name="Status is 200" time="0.707" classname="3CartTcApi020BAdd2Units"/>
+  <testsuite name="3. Cart / TC-API-020b Add 2 units" id="5f85609f-0a99-4b6a-a14f-f85c1c262e61" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.645">
+    <testcase name="Status is 200" time="0.645" classname="3CartTcApi020BAdd2Units"/>
   </testsuite>
-  <testsuite name="3. Cart / TC-API-021 Add quantity 0 (min-1)" id="4fb34465-fbe8-4dcc-ad86-deff9f5171a7" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.653">
-    <testcase name="Status is 422" time="0.653" classname="3CartTcApi021AddQuantity0Min1"/>
-    <testcase name="quantity error" time="0.653" classname="3CartTcApi021AddQuantity0Min1"/>
+  <testsuite name="3. Cart / TC-API-021 Add quantity 0 (min-1)" id="5d6371dd-3166-43a0-b5b6-49e6eda34251" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.576">
+    <testcase name="Status is 422" time="0.576" classname="3CartTcApi021AddQuantity0Min1"/>
+    <testcase name="quantity error" time="0.576" classname="3CartTcApi021AddQuantity0Min1"/>
   </testsuite>
-  <testsuite name="3. Cart / TC-API-021 Add quantity 100 (max+1)" id="62f31df3-3302-4495-8b5a-231b63100cdd" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.620">
-    <testcase name="Status is 422" time="0.620" classname="3CartTcApi021AddQuantity100Max1"/>
-    <testcase name="quantity error" time="0.620" classname="3CartTcApi021AddQuantity100Max1"/>
+  <testsuite name="3. Cart / TC-API-021 Add quantity 100 (max+1)" id="42e36f28-2bb3-41e5-83d9-4b6843e505bf" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.645">
+    <testcase name="Status is 422" time="0.645" classname="3CartTcApi021AddQuantity100Max1"/>
+    <testcase name="quantity error" time="0.645" classname="3CartTcApi021AddQuantity100Max1"/>
   </testsuite>
-  <testsuite name="3. Cart / TC-API-022 Add unknown product" id="4349cf35-ef6e-4a50-bd0c-28227e5fae76" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.616">
-    <testcase name="Status is 422" time="0.616" classname="3CartTcApi022AddUnknownProduct"/>
+  <testsuite name="3. Cart / TC-API-022 Add unknown product" id="12a10634-889b-4660-8910-789fbc69b3de" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.563">
+    <testcase name="Status is 422" time="0.563" classname="3CartTcApi022AddUnknownProduct"/>
   </testsuite>
-  <testsuite name="3. Cart / TC-API-020c Get cart" id="27a434f9-fe29-4b69-8fa2-4efd181f6201" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.616">
-    <testcase name="Status is 200" time="0.616" classname="3CartTcApi020CGetCart"/>
-    <testcase name="Cart holds exactly 2 units of the product" time="0.616" classname="3CartTcApi020CGetCart"/>
+  <testsuite name="3. Cart / TC-API-020c Get cart" id="ee92c8d9-b60a-42ed-b478-37502a01cdbe" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.652">
+    <testcase name="Status is 200" time="0.652" classname="3CartTcApi020CGetCart"/>
+    <testcase name="Cart holds exactly 2 units of the product" time="0.652" classname="3CartTcApi020CGetCart"/>
   </testsuite>
-  <testsuite name="4. Checkout (payment &amp; invoice) / Postcode lookup (billing address)" id="838e20ff-2cf8-4439-b507-7f04cfa76870" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.629">
-    <testcase name="Status is 200" time="0.629" classname="4CheckoutPaymentAmpInvoicePostcodeLookupBillingAddress"/>
-    <testcase name="Returns city and state" time="0.629" classname="4CheckoutPaymentAmpInvoicePostcodeLookupBillingAddress"/>
+  <testsuite name="4. Checkout (payment &amp; invoice) / Postcode lookup (billing address)" id="17832b09-f64a-4abc-ae11-5ef8dc3a2bba" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.557">
+    <testcase name="Status is 200" time="0.557" classname="4CheckoutPaymentAmpInvoicePostcodeLookupBillingAddress"/>
+    <testcase name="Returns city and state" time="0.557" classname="4CheckoutPaymentAmpInvoicePostcodeLookupBillingAddress"/>
   </testsuite>
-  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-030a Payment check – valid credit card" id="2c1154bb-fae8-40b1-8ae6-431786e42585" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.599">
-    <testcase name="Status is 200" time="0.599" classname="4CheckoutPaymentAmpInvoiceTcApi030APaymentCheckValidCreditCard"/>
-    <testcase name="Payment successful" time="0.599" classname="4CheckoutPaymentAmpInvoiceTcApi030APaymentCheckValidCreditCard"/>
+  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-030a Payment check – valid credit card" id="b81b248c-1cbc-4e57-9018-00cd41b5c20e" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.631">
+    <testcase name="Status is 200" time="0.631" classname="4CheckoutPaymentAmpInvoiceTcApi030APaymentCheckValidCreditCard"/>
+    <testcase name="Payment successful" time="0.631" classname="4CheckoutPaymentAmpInvoiceTcApi030APaymentCheckValidCreditCard"/>
   </testsuite>
-  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-034 Payment check – expired card (last month)" id="f9b42639-757b-4670-9f9c-69515e97b28a" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.614">
-    <testcase name="Status is 422" time="0.614" classname="4CheckoutPaymentAmpInvoiceTcApi034PaymentCheckExpiredCardLastMonth"/>
-    <testcase name="Only the expiry date is flagged" time="0.614" classname="4CheckoutPaymentAmpInvoiceTcApi034PaymentCheckExpiredCardLastMonth"/>
+  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-034 Payment check – expired card (last month)" id="0fea2cd2-d3f2-4c2c-ba81-01c8cda4fadf" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.559">
+    <testcase name="Status is 422" time="0.559" classname="4CheckoutPaymentAmpInvoiceTcApi034PaymentCheckExpiredCardLastMonth"/>
+    <testcase name="Only the expiry date is flagged" time="0.559" classname="4CheckoutPaymentAmpInvoiceTcApi034PaymentCheckExpiredCardLastMonth"/>
   </testsuite>
-  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-031 Create order without token" id="fa2156b1-f0ff-4082-ba00-77c1a4e73713" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.623">
-    <testcase name="Status is 401" time="0.623" classname="4CheckoutPaymentAmpInvoiceTcApi031CreateOrderWithoutToken"/>
+  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-031 Create order without token" id="3c0c82ac-dffc-40f9-ae05-7516f81dd32a" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.645">
+    <testcase name="Status is 401" time="0.645" classname="4CheckoutPaymentAmpInvoiceTcApi031CreateOrderWithoutToken"/>
   </testsuite>
-  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-032 Create order – city does not match postcode" id="b9b44c63-9858-4b4b-95c1-b9a2959934b0" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.637">
-    <testcase name="Status is 422" time="0.637" classname="4CheckoutPaymentAmpInvoiceTcApi032CreateOrderCityDoesNotMatchPostcode"/>
-    <testcase name="Address validation message" time="0.637" classname="4CheckoutPaymentAmpInvoiceTcApi032CreateOrderCityDoesNotMatchPostcode"/>
+  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-032 Create order – city does not match postcode" id="8faa108e-b4f7-467c-80f4-24ae1cadb858" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.580">
+    <testcase name="Status is 422" time="0.580" classname="4CheckoutPaymentAmpInvoiceTcApi032CreateOrderCityDoesNotMatchPostcode"/>
+    <testcase name="Address validation message" time="0.580" classname="4CheckoutPaymentAmpInvoiceTcApi032CreateOrderCityDoesNotMatchPostcode"/>
   </testsuite>
-  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-033 Create order – unknown cart" id="0470aa7e-603b-4614-9f1b-d8842e3dbe40" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.739">
-    <testcase name="Status is 404" time="0.739" classname="4CheckoutPaymentAmpInvoiceTcApi033CreateOrderUnknownCart"/>
+  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-033 Create order – unknown cart" id="57527cee-0bfe-4240-87cd-7e11967c4105" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.625">
+    <testcase name="Status is 404" time="0.625" classname="4CheckoutPaymentAmpInvoiceTcApi033CreateOrderUnknownCart"/>
   </testsuite>
-  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-030b Create order" id="82295cfb-ea8f-4010-bb4f-adc53607db24" timestamp="2026-11-06T12:08:09.844Z" tests="4" failures="0" errors="0" time="0.829">
-    <testcase name="Status is 201" time="0.829" classname="4CheckoutPaymentAmpInvoiceTcApi030BCreateOrder"/>
-    <testcase name="Invoice number issued" time="0.829" classname="4CheckoutPaymentAmpInvoiceTcApi030BCreateOrder"/>
-    <testcase name="Total = unit price x 2" time="0.829" classname="4CheckoutPaymentAmpInvoiceTcApi030BCreateOrder"/>
-    <testcase name="Billing address persisted" time="0.829" classname="4CheckoutPaymentAmpInvoiceTcApi030BCreateOrder"/>
+  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-030b Create order" id="04c8c39f-a26b-476b-9662-7097beabbfb0" timestamp="2026-11-08T12:27:15.155Z" tests="4" failures="0" errors="0" time="0.639">
+    <testcase name="Status is 201" time="0.639" classname="4CheckoutPaymentAmpInvoiceTcApi030BCreateOrder"/>
+    <testcase name="Invoice number issued" time="0.639" classname="4CheckoutPaymentAmpInvoiceTcApi030BCreateOrder"/>
+    <testcase name="Total = unit price x 2" time="0.639" classname="4CheckoutPaymentAmpInvoiceTcApi030BCreateOrder"/>
+    <testcase name="Billing address persisted" time="0.639" classname="4CheckoutPaymentAmpInvoiceTcApi030BCreateOrder"/>
   </testsuite>
-  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-030c Get invoice" id="4ab400ad-5c4e-4ef7-b84b-a0a91f72bf9b" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.660">
-    <testcase name="Status is 200" time="0.660" classname="4CheckoutPaymentAmpInvoiceTcApi030CGetInvoice"/>
-    <testcase name="Awaiting fulfilment with one line of 2 units" time="0.660" classname="4CheckoutPaymentAmpInvoiceTcApi030CGetInvoice"/>
+  <testsuite name="4. Checkout (payment &amp; invoice) / TC-API-030c Get invoice" id="b4bd3195-9681-4708-93d6-a701073088e2" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.684">
+    <testcase name="Status is 200" time="0.684" classname="4CheckoutPaymentAmpInvoiceTcApi030CGetInvoice"/>
+    <testcase name="Awaiting fulfilment with one line of 2 units" time="0.684" classname="4CheckoutPaymentAmpInvoiceTcApi030CGetInvoice"/>
   </testsuite>
-  <testsuite name="5. Defect reproduction (evidence) / DEF-002 Checkout the same cart a second time" id="744630b5-b0b6-480b-9beb-ab1abf73e017" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="1.025">
-    <testcase name="DEF-002 reproduced – duplicate order accepted (expected 4xx, got 201)" time="1.025" classname="5DefectReproductionEvidenceDef002CheckoutTheSameCartASecondTime"/>
-    <testcase name="A different invoice number was issued" time="1.025" classname="5DefectReproductionEvidenceDef002CheckoutTheSameCartASecondTime"/>
+  <testsuite name="5. Defect reproduction (evidence) / DEF-002 Checkout the same cart a second time" id="bb6fd9f3-cd37-4489-804c-8b6eaba942e2" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.647">
+    <testcase name="DEF-002 reproduced – duplicate order accepted (expected 4xx, got 201)" time="0.647" classname="5DefectReproductionEvidenceDef002CheckoutTheSameCartASecondTime"/>
+    <testcase name="A different invoice number was issued" time="0.647" classname="5DefectReproductionEvidenceDef002CheckoutTheSameCartASecondTime"/>
   </testsuite>
-  <testsuite name="5. Defect reproduction (evidence) / DEF-003 a) Create empty cart" id="6a0ab7b5-fd92-44f1-9cba-2e7a9bff9614" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.600">
-    <testcase name="Status is 201" time="0.600" classname="5DefectReproductionEvidenceDef003ACreateEmptyCart"/>
+  <testsuite name="5. Defect reproduction (evidence) / DEF-003 a) Create empty cart" id="eea4c830-0514-4d34-b2a7-b8dd7e8fb8f4" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.591">
+    <testcase name="Status is 201" time="0.591" classname="5DefectReproductionEvidenceDef003ACreateEmptyCart"/>
   </testsuite>
-  <testsuite name="5. Defect reproduction (evidence) / DEF-003 b) Order the empty cart" id="899e1ff1-65fb-42aa-b610-8502937816e9" timestamp="2026-11-06T12:08:09.844Z" tests="2" failures="0" errors="0" time="0.950">
-    <testcase name="DEF-003 reproduced – order for empty cart accepted (expected 422, got 201)" time="0.950" classname="5DefectReproductionEvidenceDef003BOrderTheEmptyCart"/>
-    <testcase name="Invoice total is 0" time="0.950" classname="5DefectReproductionEvidenceDef003BOrderTheEmptyCart"/>
+  <testsuite name="5. Defect reproduction (evidence) / DEF-003 b) Order the empty cart" id="26f05acb-7a2c-4ff5-9c0c-2169d73b0ad8" timestamp="2026-11-08T12:27:15.155Z" tests="2" failures="0" errors="0" time="0.678">
+    <testcase name="DEF-003 reproduced – order for empty cart accepted (expected 422, got 201)" time="0.678" classname="5DefectReproductionEvidenceDef003BOrderTheEmptyCart"/>
+    <testcase name="Invoice total is 0" time="0.678" classname="5DefectReproductionEvidenceDef003BOrderTheEmptyCart"/>
   </testsuite>
-  <testsuite name="5. Defect reproduction (evidence) / OBS-1 a) Create cart with 60 units" id="80c73902-0277-4747-89f2-62cdcd609a9b" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.886">
-    <testcase name="Status is 201" time="0.886" classname="5DefectReproductionEvidenceObs1ACreateCartWith60Units"/>
+  <testsuite name="5. Defect reproduction (evidence) / OBS-1 a) Create cart with 60 units" id="4a755c51-a43a-416e-af19-b6a37d16b95e" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.594">
+    <testcase name="Status is 201" time="0.594" classname="5DefectReproductionEvidenceObs1ACreateCartWith60Units"/>
   </testsuite>
-  <testsuite name="5. Defect reproduction (evidence) / OBS-1 b) Add 60" id="ad8f73b6-03f6-4f34-8c55-30421671a4a4" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.956">
-    <testcase name="Status is 200" time="0.956" classname="5DefectReproductionEvidenceObs1BAdd60"/>
+  <testsuite name="5. Defect reproduction (evidence) / OBS-1 b) Add 60" id="47eeff56-9dd1-43c2-baea-94ff236e97fc" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.828">
+    <testcase name="Status is 200" time="0.828" classname="5DefectReproductionEvidenceObs1BAdd60"/>
   </testsuite>
-  <testsuite name="5. Defect reproduction (evidence) / OBS-1 c) Add 60 again" id="5d95d0eb-f8cb-4131-b251-9fbe78cfc0ba" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.635">
-    <testcase name="Status is 200" time="0.635" classname="5DefectReproductionEvidenceObs1CAdd60Again"/>
+  <testsuite name="5. Defect reproduction (evidence) / OBS-1 c) Add 60 again" id="d508475f-e0ea-4657-8e19-fa73da01e789" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.588">
+    <testcase name="Status is 200" time="0.588" classname="5DefectReproductionEvidenceObs1CAdd60Again"/>
   </testsuite>
-  <testsuite name="5. Defect reproduction (evidence) / OBS-1 d) Cart line exceeds 99" id="f8218820-3e1e-4772-90a7-4fec28ee7bfd" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.761">
-    <testcase name="OBS-1 reproduced – line quantity is 120 (max is 99)" time="0.761" classname="5DefectReproductionEvidenceObs1DCartLineExceeds99"/>
+  <testsuite name="5. Defect reproduction (evidence) / OBS-1 d) Cart line exceeds 99" id="e994e1b1-ff4c-43da-8877-2afaa741d00f" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.613">
+    <testcase name="OBS-1 reproduced – line quantity is 120 (max is 99)" time="0.613" classname="5DefectReproductionEvidenceObs1DCartLineExceeds99"/>
   </testsuite>
-  <testsuite name="5. Defect reproduction (evidence) / OBS-3 Payment check with unknown method" id="532d35dc-ee8d-4f89-96f4-e083a3ac8e28" timestamp="2026-11-06T12:08:09.844Z" tests="1" failures="0" errors="0" time="0.609">
-    <testcase name="OBS-3 reproduced – unknown payment method reported successful" time="0.609" classname="5DefectReproductionEvidenceObs3PaymentCheckWithUnknownMethod"/>
+  <testsuite name="5. Defect reproduction (evidence) / OBS-3 Payment check with unknown method" id="bdde4f10-2ed1-4326-9c0f-b457a46aef47" timestamp="2026-11-08T12:27:15.155Z" tests="1" failures="0" errors="0" time="0.607">
+    <testcase name="OBS-3 reproduced – unknown payment method reported successful" time="0.607" classname="5DefectReproductionEvidenceObs3PaymentCheckWithUnknownMethod"/>
   </testsuite>
 </testsuites>

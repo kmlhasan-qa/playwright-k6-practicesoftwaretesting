@@ -56,4 +56,16 @@ test.describe('Cart @api', () => {
     const cart = await (await api.getCart(cartId)).json();
     expect(cart.cart_items.map((i: { quantity: number }) => i.quantity)).toEqual([5]);
   });
+
+  test('TC-API-024 | Price and discount sent by the client are ignored when adding to the cart', async ({ api }) => {
+    const product = await api.purchasableProduct();
+    const cartId = await api.createCartOrFail();
+    const res = await api.addToCartRaw(cartId, { product_id: product.id, quantity: 1, price: 0.01, discount_percentage: 90 });
+    expect(res.status()).toBe(200);
+
+    const cart = await (await api.getCart(cartId)).json();
+    expect(cart.cart_items).toEqual([
+      expect.objectContaining({ quantity: 1, discount_percentage: null, product: expect.objectContaining({ price: product.price }) }),
+    ]);
+  });
 });

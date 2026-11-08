@@ -99,8 +99,8 @@ This ensures that automation development and execution history are continuously 
 **Prerequisites:** Node.js 20+ (22 recommended), npm, and [k6](https://k6.io/docs/get-started/installation/) for the performance tests.
 
 ```bash
-git clone <this-repo-url>
-cd <repo>
+git clone https://github.com/kmlhasan-qa/playwright-k6-practicesoftwaretesting.git
+cd playwright-k6-practicesoftwaretesting
 npm ci
 npx playwright install --with-deps chromium
 cp .env.example .env        # optional – every value has a default
@@ -125,11 +125,11 @@ Environment variables (`.env` or shell): `BASE_URL`, `API_URL`, `HEADLESS`, `CUS
 
 **CI:** `.github/workflows/playwright.yml` runs the `api` and `ui` projects plus the Postman collection on every push, every PR and nightly, and uploads the reports. The k6 smoke run is manual only (workflow_dispatch), so the public demo never gets automatic load.
 
-**Last local run (7 Nov 2026):**
+**Last local run (8 Nov 2026):**
 - Playwright UI: 3 passed (TC-UI-001, TC-UI-002; TC-UI-003 is the DEF-001 test and fails as expected).
-- Playwright API: 37 passed (31 functional tests; the other 6 are known-defect tests that fail as expected).
-- newman: 33 requests, 56/56 assertions passed (last run 6 Nov 2026).
-- k6 smoke: every threshold passed; 121 of 121 orders with 0% errors and 0 dropped iterations. Booking p95: normal 487 ms, ramp 528 ms, peak 400 ms, recovery 395 ms.
+- Playwright API: 52 passed (37 functional tests; the other 15 are known-defect tests that fail as expected).
+- newman: 33 requests, 56/56 assertions passed.
+- k6 smoke: every threshold passed; 121 of 121 orders with 0% errors and 0 dropped iterations. Booking p95: normal 356 ms, ramp 380 ms, peak 387 ms, recovery 357 ms.
 
 ---
 
@@ -149,8 +149,8 @@ Environment variables (`.env` or shell): `BASE_URL`, `API_URL`, `HEADLESS`, `CUS
 │   ├── api/                   # project "api"
 │   │   ├── auth.spec.ts       # register, login, password policy, age rule, breached passwords
 │   │   ├── products.spec.ts   # list contract, detail, search, 404
-│   │   ├── cart.spec.ts       # cart CRUD + quantity boundary values
-│   │   ├── checkout.spec.ts   # payment check + order creation, auth, validation
+│   │   ├── cart.spec.ts       # cart CRUD, quantity boundary values, price tampering
+│   │   ├── checkout.spec.ts   # payment check, order creation (all payment methods), auth, validation, invoice access
 │   │   └── defects.spec.ts    # executable defect reports (test.fail)
 │   └── ui/
 │       └── checkout.e2e.spec.ts   # TC-UI-001 E2E, TC-UI-002 negative, TC-UI-003 regression
@@ -185,26 +185,27 @@ Environment variables (`.env` or shell): `BASE_URL`, `API_URL`, `HEADLESS`, `CUS
 
 ## 3. Defects found (summary)
 
-Full reports, sorted by severity and priority: `docs/test-cases-and-automation.docx`, section 4. DEF-004–006 and OBS-6–10 were found by exploratory API testing on 7 Nov 2026 and have no automated test yet.
+Full reports, sorted by severity and priority: `docs/test-cases-and-automation.docx`, section 4. DEF-004–006 and OBS-6–10 were found by exploratory API testing on 7 Nov 2026 and OBS-11 on 8 Nov 2026; since 8 Nov every defect except OBS-2 has an automated test (marked `test.fail()`).
 
 | ID | Severity | Priority | Summary | Covered by |
 |---|---|---|---|---|
 | DEF-001 | **High** | P1 | When `POST /invoices` is rejected, the UI shows no error and keeps showing "Payment was successful". The customer believes the order went through. | TC-UI-003 |
 | DEF-002 | **High** | P1 | The same cart can be checked out repeatedly, and every call creates a new order (double-click, retry or second tab gives duplicate orders). | TC-API-040, Postman |
-| DEF-004 | **High** | P1 | `POST /invoices` accepts an **expired credit card** (201, order created). Expiry is only checked by `/payment/check`, which API clients can skip. | manual (7 Nov) |
-| DEF-005 | **High** | P1 | The **full card number and CVV** are stored and returned in plain text by `GET /invoices/{id}`. | manual (7 Nov) |
+| DEF-004 | **High** | P1 | `POST /invoices` accepts an **expired credit card** (201, order created). Expiry is only checked by `/payment/check`, which API clients can skip. | TC-API-046 |
+| DEF-005 | **High** | P1 | The **full card number and CVV** are stored and returned in plain text by `GET /invoices/{id}`. | TC-API-047 |
 | DEF-003 | **High** | P2 | An order (invoice of 0.00) can be created for an **empty cart**. | TC-API-041, Postman |
-| DEF-006 | **High** | P2 | **Out-of-stock** products can be added to the cart and ordered (201). | manual (7 Nov) |
+| DEF-006 | **High** | P2 | **Out-of-stock** products can be added to the cart and ordered (201). | TC-API-048 |
 | OBS-1 | Medium | P2 | The quantity limit of 99 can be bypassed by adding the same product twice (line quantity 120). | TC-API-042 |
 | OBS-2 | Medium | P2 | Race on the address step: the asynchronously pre-filled saved address can overwrite the postcode-lookup values, or the other way round. | page object workaround |
-| OBS-6 | Medium | P2 | A card that **expires this month** is rejected ("must be a date after today"). | manual (7 Nov) |
-| OBS-7 | Medium | P2 | Registration accepts **invalid email addresses** (`qa x@exa mple`, no `@`). | manual (7 Nov) |
+| OBS-6 | Medium | P2 | A card that **expires this month** is rejected ("must be a date after today"). | TC-API-049 |
+| OBS-7 | Medium | P2 | Registration accepts **invalid email addresses** (`qa x@exa mple`, no `@`). | TC-API-050 |
 | OBS-3 | Medium | P3 | `POST /payment/check` returns "Payment was successful" for an unknown method (`bitcoin`) and for an empty body. | TC-API-043 |
 | OBS-4 | Medium | P3 | Invalid card data on `POST /invoices` returns **500** instead of 422. | TC-API-044 |
 | OBS-5 | Low | P3 | `billing_postal_code` is required by the API spec but can be omitted (201), which also skips the address check. | TC-API-045 |
-| OBS-8 | Low | P3 | The upper age limit is not enforced as stated: ages 76–80 are accepted although the message says "younger than 75". | manual (7 Nov) |
-| OBS-9 | Low | P3 | A customer who turns 18 today is rejected (off by one day). | manual (7 Nov) |
-| OBS-10 | Low | P3 | Updating the quantity of a product that is not in the cart returns 200 but changes nothing. | manual (7 Nov) |
+| OBS-8 | Low | P3 | The upper age limit is not enforced as stated: ages 76–80 are accepted although the message says "younger than 75". | TC-API-051 |
+| OBS-9 | Low | P3 | A customer who turns 18 today is rejected (off by one day). | TC-API-052 |
+| OBS-10 | Low | P3 | Updating the quantity of a product that is not in the cart returns 200 but changes nothing. | TC-API-053 |
+| OBS-11 | Low | P3 | Registration accepts a phone number with letters (`call me maybe`), which the profile update then rejects, so the customer cannot save profile changes until they fix it. | TC-API-054 |
 
 ---
 
@@ -234,7 +235,7 @@ The workload model, checks and threshold reasoning are explained in `docs/test-c
 ## 5. What I would improve with more time
 
 - **Own environment.** Run the Toolshop locally with Docker Compose (the upstream project ships a `docker-compose.yml`) in CI. Tests would then not depend on, or pollute, the shared demo, the database could be reset per run, and the full k6 load profile could run.
-- **More checkout coverage:** the other payment methods (bank transfer, gift card, buy-now-pay-later instalments), guest checkout (`/invoices/guest`), and changing the quantity or removing a line in the cart through the UI.
+- **More checkout coverage:** guest checkout (`/invoices/guest`), and changing the quantity or removing a line in the cart through the UI. (The other payment methods are covered at API level by TC-API-037.)
 - **Contract tests** generated from the OpenAPI spec (e.g. `ajv` against `/docs?api-docs.json`) instead of hand-written `toMatchObject`.
 - **Session reuse** with `storageState` for UI tests that don't need to exercise login.
 - **Cross-browser and mobile** projects, accessibility checks (`@axe-core/playwright`) and visual snapshots of the checkout steps.

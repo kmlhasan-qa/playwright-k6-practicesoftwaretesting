@@ -105,6 +105,11 @@ export class ToolshopApi {
     return this.request.post(this.url(`/carts/${cartId}`), { data: { product_id: productId, quantity } });
   }
 
+  /** Sends an arbitrary add-to-cart body (e.g. extra fields a tampering client might send). */
+  addToCartRaw(cartId: string, body: Record<string, unknown>): Promise<APIResponse> {
+    return this.request.post(this.url(`/carts/${cartId}`), { data: body });
+  }
+
   updateQuantity(cartId: string, productId: string, quantity: unknown): Promise<APIResponse> {
     return this.request.put(this.url(`/carts/${cartId}/product/quantity`), {
       data: { product_id: productId, quantity },
