@@ -139,14 +139,15 @@ Then run the load scripts with `API_URL=http://localhost:8091`, and stop the sta
 **CI:** `.github/workflows/playwright.yml` runs the `api` and `ui` projects plus the Postman collection on every push, every PR and nightly, and uploads the reports. The k6 smoke run is manual only (workflow_dispatch), so the public demo never gets automatic load.
 
 **Last local run (8 Nov 2026):**
-- Playwright UI (19:34): 3 tests – 2 passed; TC-UI-003 is the DEF-001 test and fails as expected. 0 failed.
-- Playwright API (19:34): 52 tests – 37 passed; the other 15 are known-defect tests that fail as expected. 0 failed.
-- newman (19:27): 33 requests, 56/56 assertions passed.
-- k6 smoke (public demo, 19:53): every threshold passed; 123 of 123 orders with 0% errors and 0 dropped iterations. Booking p95: normal 361 ms, ramp 439 ms, peak 376 ms, recovery 344 ms.
-- k6 load, full model (local Docker Toolshop, 20:19, ~18 min): every threshold passed; 12,150 orders at 11.2/s average, 0% errors, 0 dropped. Booking p95: normal 20 ms, ramp 16 ms, peak 17 ms, recovery 19 ms.
-- k6 normal / ramp / peak phases on their own (local Docker Toolshop, 5 min each): every threshold passed; 1,501 / 3,750 / 6,001 orders, 0% errors, 0 dropped. Booking p95 22 / 16 / 15 ms.
+- Playwright UI (21:12): 3 tests – 2 passed; TC-UI-003 is the DEF-001 test and fails as expected. 0 failed.
+- Playwright API (21:12): 52 tests – 37 passed; the other 15 are known-defect tests that fail as expected. 0 failed.
+- newman (21:13): 33 requests, 56/56 assertions passed.
+- k6 smoke (public demo, 21:13): every threshold passed; 121 of 121 orders, 0% errors, 0 dropped. Booking p95: normal 396 ms, ramp 366 ms, peak 407 ms, recovery 362 ms.
+- k6 load, full model (local Docker Toolshop, 21:15, ~18 min): every threshold passed; 12,151 orders at 11.2/s average, 0% errors, 0 dropped. Booking p95: normal 20 ms, ramp 17 ms, peak 17 ms, recovery 19 ms.
+- k6 normal / ramp / peak phases on their own (local Docker Toolshop, 5 min each): every threshold passed; 1,501 / 3,750 / 6,001 orders, 0% errors, 0 dropped. Booking p95 16 / 16 / 16 ms.
 - k6 recovery phase on its own: not run separately (covered by the full load run).
-- The local numbers have no internet latency and show what one MacBook can handle, not production capacity.
+- The local numbers have no internet latency and show what one laptop can handle, not production capacity.
+- An earlier run at 20:59 hit a short outage of the public demo (500 on registration): 21 Playwright tests and 25 newman assertions failed; it is kept in the run history.
 
 Details of each run (commit, target, every test and threshold) and the run history: `docs/test-cases-and-automation.docx` §6, built from `docs/test-run-log.jsonl`.
 
@@ -204,52 +205,93 @@ Details of each run (commit, target, every test and threshold) and the run histo
 
 ## 3. Defects found (summary)
 
-Full reports, sorted by severity and priority: `docs/test-cases-and-automation.docx`, section 4. DEF-004–006 and OBS-6–10 were found by exploratory API testing on 7 Nov 2026 and OBS-11 on 8 Nov 2026; since 8 Nov every defect except OBS-2 has an automated test (marked `test.fail()`).
+Full reports, sorted by severity and priority: `docs/test-cases-and-automation.docx`, section 4.
+
+Found and re-confirmed by the codebase-QA pass INSP-1 (8 Nov 2026); DEF-007 and OBS-12 were found by test research the same day and verified on the local Docker Toolshop and the public demo. Every defect except OBS-2, DEF-007 and OBS-12 has an automated test that asserts the correct behaviour and is marked `test.fail()`.
 
 | ID | Severity | Priority | Summary | Covered by |
 |---|---|---|---|---|
-| DEF-001 | **High** | P1 | When `POST /invoices` is rejected, the UI shows no error and keeps showing "Payment was successful". The customer believes the order went through. | TC-UI-003 |
-| DEF-002 | **High** | P1 | The same cart can be checked out repeatedly, and every call creates a new order (double-click, retry or second tab gives duplicate orders). | TC-API-040, Postman |
-| DEF-004 | **High** | P1 | `POST /invoices` accepts an **expired credit card** (201, order created). Expiry is only checked by `/payment/check`, which API clients can skip. | TC-API-046 |
-| DEF-005 | **High** | P1 | The **full card number and CVV** are stored and returned in plain text by `GET /invoices/{id}`. | TC-API-047 |
+| DEF-001 | **High** | P1 | When `POST /invoices` is rejected, the UI shows no error and keeps showing "Payment was successful". | TC-UI-003 |
+| DEF-002 | **High** | P1 | The same cart can be checked out repeatedly; every call creates a new order. | TC-API-040, Postman |
+| DEF-004 | **High** | P1 | `POST /invoices` accepts an **expired credit card** that `/payment/check` rejects. | TC-API-046 |
+| DEF-005 | **High** | P1 | The **full card number and CVV** are returned in plain text by `GET /invoices/{id}`. | TC-API-047 |
+| DEF-007 | **High** | P1 | A customer can change the **status of their own order** (e.g. to SHIPPED or COMPLETED) via `PUT /invoices/{id}/status`. | manual probe (8 Nov 2026) |
 | DEF-003 | **High** | P2 | An order (invoice of 0.00) can be created for an **empty cart**. | TC-API-041, Postman |
-| DEF-006 | **High** | P2 | **Out-of-stock** products can be added to the cart and ordered (201). | TC-API-048 |
-| OBS-1 | Medium | P2 | The quantity limit of 99 can be bypassed by adding the same product twice (line quantity 120). | TC-API-042 |
-| OBS-2 | Medium | P2 | Race on the address step: the asynchronously pre-filled saved address can overwrite the postcode-lookup values, or the other way round. | page object workaround |
-| OBS-6 | Medium | P2 | A card that **expires this month** is rejected ("must be a date after today"). | TC-API-049 |
-| OBS-7 | Medium | P2 | Registration accepts **invalid email addresses** (`qa x@exa mple`, no `@`). | TC-API-050 |
-| OBS-3 | Medium | P3 | `POST /payment/check` returns "Payment was successful" for an unknown method (`bitcoin`) and for an empty body. | TC-API-043 |
-| OBS-4 | Medium | P3 | Invalid card data on `POST /invoices` returns **500** instead of 422. | TC-API-044 |
-| OBS-5 | Low | P3 | `billing_postal_code` is required by the API spec but can be omitted (201), which also skips the address check. | TC-API-045 |
-| OBS-8 | Low | P3 | The upper age limit is not enforced as stated: ages 76–80 are accepted although the message says "younger than 75". | TC-API-051 |
+| DEF-006 | **High** | P2 | **Out-of-stock** products can be added to the cart and ordered. | TC-API-048 |
+| OBS-1 | Medium | P2 | The quantity limit of 99 is bypassed by adding the same product twice (line of 120). | TC-API-042, Postman |
+| OBS-2 | Medium | P2 | Race on the address step: the pre-filled saved address can overwrite the postcode-lookup values. | page object workaround (manual) |
+| OBS-6 | Medium | P2 | A card that **expires this month** is rejected. | TC-API-049 |
+| OBS-7 | Medium | P2 | Registration accepts an email address without `@`. | TC-API-050 |
+| OBS-3 | Medium | P3 | `POST /payment/check` reports success for an unknown method and for an empty body. | TC-API-043, Postman |
+| OBS-4 | Medium | P3 | A malformed card on `POST /invoices` returns **500** instead of 422. | TC-API-044 |
+| OBS-12 | Medium | P3 | A customer can edit the billing address of a placed order at any time, even after it is COMPLETED. | manual probe (8 Nov 2026) |
+| OBS-5 | Low | P3 | `billing_postal_code` can be omitted (201), which skips the address check. | TC-API-045 |
+| OBS-8 | Low | P3 | A 77-year-old customer is accepted although the message says "younger than 75". | TC-API-051 |
 | OBS-9 | Low | P3 | A customer who turns 18 today is rejected (off by one day). | TC-API-052 |
-| OBS-10 | Low | P3 | Updating the quantity of a product that is not in the cart returns 200 but changes nothing. | TC-API-053 |
-| OBS-11 | Low | P3 | Registration accepts a phone number with letters (`call me maybe`), which the profile update then rejects, so the customer cannot save profile changes until they fix it. | TC-API-054 |
+| OBS-10 | Low | P3 | Updating the quantity of a product that is not in the cart returns 200 and changes nothing. | TC-API-053 |
+| OBS-11 | Low | P3 | Registration accepts a phone number with letters that the profile update then rejects. | TC-API-054 |
 
 ---
 
 ## 4. Performance test (summary)
 
-`perf/checkout-load.js` uses an **open workload model** (arrival-rate executors). One iteration is one customer order (`POST /carts` → `POST /carts/{id}` → `POST /invoices`), and the rates apply to the booking call:
+`perf/checkout-load.js` load-tests the shop's "booking" – placing an order. One k6 iteration is one realistic customer order: `POST /carts` → `POST /carts/{id}` (add 1 item) → `POST /invoices` (signed in, cash on delivery). A pool of 10 test customers is registered in `setup()`, and their tokens are refreshed before they expire.
 
-| Phase | Executor | Rate | Duration (load profile) |
-|---|---|---|---|
-| normal | constant-arrival-rate | 5 orders/s | 5 min |
-| ramp_up | ramping-arrival-rate | 5 → 20/s | 5 min |
-| peak | constant-arrival-rate | 20/s | 5 min |
-| recovery | constant-arrival-rate | 5/s | 3 min |
+### Workload model
 
-**Thresholds:**
-- Order success > 99%, checks > 99%.
-- Booking error rate < 1%.
-- Booking p95 < 1 s at normal load and < 1.5 s at peak.
-- Cart calls p95 < 800 ms; full order flow p95 < 3 s.
-- Fewer than 10 dropped iterations.
-- The run aborts if the overall error rate goes above 5%.
+The script uses an **open workload model** (k6 arrival-rate executors): new orders start at a fixed rate whether or not the system keeps up, just as real customers keep arriving when a shop slows down. A closed model (a fixed number of virtual users looping) would hide a slowdown, because slower responses would automatically lower the load. In the open model a slowdown shows up as higher latency, errors or dropped iterations. The rates apply to the booking call; each order adds about two supporting calls, so total HTTP traffic is about 3× the order rate.
 
-**Where each profile runs:** the smoke profile (1 order/s) runs against the public demo; the full load profile and the single load phases run against the local Toolshop in Docker (see section 1), so the shared demo never receives load.
+| Phase | Executor | Rate | Duration (load profile) | What it answers |
+|---|---|---|---|---|
+| normal | constant-arrival-rate | 5 orders/s | 5 min | Is the shop within budget at expected traffic? |
+| ramp_up | ramping-arrival-rate | 5 → 20/s | 5 min | At what rate does latency start to rise? |
+| peak | constant-arrival-rate | 20/s | 5 min | Does it hold 4× normal traffic (a sale or campaign)? |
+| recovery | constant-arrival-rate | 5/s | 3 min | Does it return to normal once the peak is over? |
 
-The workload model, checks and threshold reasoning are explained in `docs/test-cases-and-automation.docx` §3.4; the results of every run kind are in §6.5.
+`npm run perf:load` runs all four in sequence (about 18 minutes, about 12,000 orders); each phase can also run on its own (`perf:normal`, `perf:ramp`, `perf:peak`, `perf:recovery`). The **smoke** profile runs the same four phases at 1 order/s for 30 s each. Virtual users are sized with Little's law (VUs ≈ rate × iteration time), so k6 has enough of them to deliver the planned rate.
+
+**Where each profile runs:** the smoke profile runs against the public demo. The full load profile and the single load phases run only against the local Toolshop in Docker (see section 1), so the shared demo never receives load.
+
+### Metrics monitored
+
+| Metric | Why |
+|---|---|
+| `order_success` (custom rate) and `checks` | Correctness first: an order counts only if the cart was created, the item added, the order created (201), an `INV-…` number issued **and** the invoice total equals the product price. A fast wrong answer is still a failure. |
+| `orders_created` (custom counter) and `iterations` rate | Throughput actually achieved, compared with the planned rate |
+| `http_req_duration` of `POST /invoices`, **tagged per phase** | Booking latency (median, p95, p99, max) for each phase separately, instead of one blended average |
+| `http_req_duration{flow:cart}` | Latency of the supporting cart calls |
+| `order_flow_duration` (custom trend) | The whole three-step order as the customer experiences it |
+| `http_req_failed`, overall and for `POST /invoices` | Error rate of the booking call and of all traffic |
+| `dropped_iterations`, `vus` / `vus_max` | Whether k6 really delivered the planned load. Without this, a "fast" result could just mean the load was never applied. |
+
+On an environment with server access I would also watch the server side during the run: CPU and memory of the API and database containers, PHP-FPM workers and queue, database connections and slow queries, and the application error log. The k6 numbers show *that* the shop slowed down; these show *why*.
+
+### How the thresholds were chosen
+
+| Threshold | Limit | Reasoning |
+|---|---|---|
+| Order success, checks | > 99% | Correctness before speed; 1% is the most a shop would tolerate for failed orders |
+| Booking errors (`POST /invoices`) | < 1% | A common target for a transactional endpoint |
+| All HTTP errors | < 5%, aborts the run after 30 s | A safety valve: stop loading a system that is clearly broken |
+| Booking p95, normal and recovery | < 1000 ms (p99 < 2000 ms at normal) | Measured smoke baseline on the public demo was 0.34–0.53 s p95 across the 7–8 Nov 2026 runs, so about 2× headroom |
+| Booking p95, ramp and peak | < 1500 ms (p99 < 3000 ms at peak) | Some slowdown under 4× load is acceptable, at most +50% over the normal budget |
+| Cart calls p95 | < 800 ms | Simpler calls, so a tighter budget |
+| Whole order p95 | < 3000 ms | What the customer actually waits for (3 calls) |
+| Dropped iterations | < 10 | Proves the planned load was delivered |
+
+The latency limits come from measured baselines plus headroom, combined with common web-performance budgets. There is no business SLA for this demo; with a real shop, the limits would come from the business (conversion data, an agreed SLA) and from production monitoring.
+
+### Limitations and risks
+
+- **Not production capacity.** Load runs use a local Docker copy on one laptop. k6 and the shop share its CPU, and there is no internet latency, so booking p95 is about 15–22 ms there against 340–440 ms on the public demo. The local results confirm the script and the model, and show the laptop easily handles 5–20 orders/s. They don't say what production can handle, and 20 orders/s never pushed the local shop near its limit.
+- **The public demo only gets smoke runs.** It is shared with other people, and its rate limits and hardware are unknown, so it can't be load-tested responsibly. Its smoke numbers also vary between runs and include internet latency.
+- **The rates are assumptions.** 5 and 20 orders/s are not derived from real traffic analytics. With a real shop they would come from peak-hour order data.
+- **Narrow traffic mix.** Every iteration is the same order: one item, cash on delivery, the first purchasable product. Browsing, search, other payment methods, larger carts and guest checkout are not part of the load, so database hot spots (one product row) and cache behaviour may not match reality.
+- **Short runs.** Phases last 5 minutes. Memory leaks, connection-pool exhaustion or token-refresh problems over hours need a soak test (normal rate for 1–2 h), which hasn't been run.
+- **Test data.** The local database is reset before each run, so results don't reflect a large, aged database. The API cache must be cleared after each reset, or every order fails in setup. A small pool of 10 customers places all orders, which is unrealistic for per-user locking or rate limits.
+- **No server-side metrics** in the current runs, so a slowdown could be seen but not explained.
+
+Run results for every run kind are in `docs/test-cases-and-automation.docx` §6.5; the document's §3.4 has the same model in short form.
 
 ---
 
