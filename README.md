@@ -4,6 +4,7 @@ Test automation for the public demo **[Practice Software Testing – Toolshop](h
 
 | Deliverable | Location |
 |---|---|
+| **Assessment answers** (test cases, top-3 defect reports, API testing, automation, performance approach) | `docs/assessment-submission.docx` |
 | UI + API automation (Playwright + TypeScript) | `tests/`, `pages/`, `fixtures/`, `helpers/` |
 | Postman collection (+ last run result) | `postman/toolshop-api.postman_collection.json`, `postman/results/` |
 | k6 performance script (+ smoke result) | `perf/checkout-load.js`, `perf/results/` |
