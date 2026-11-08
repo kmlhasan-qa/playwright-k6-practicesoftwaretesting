@@ -48,10 +48,10 @@ Recompute the "Totals:" sentence (total cases, automated coverage count, how man
 python3 .claude/skills/test-research/scripts/docx_tools.py dump docs/test-cases-and-automation.docx \
   | grep -cE "T[0-9]+ +(AUTH|PROD|CART|ADDR|PAY|ORD|NF)-[0-9]+ \|"
 ```
-Keep §1 (catalogue) and §2 (automated list) consistent with each other and with §4 (defects).
+Keep §1 (catalogue) and §2 (automated list) consistent with each other and with §4 (defects). Don't edit "6. Test run results": it shows what actually ran and is rebuilt by test-run-report from the run log. If tests were added or renamed since the last run, say that §6 reflects the previous suite until the next run (offer to run test-run-report).
 
 ### 5. Update the README and RUN_COMMANDS.md
-Mirror any defect-table or automation changes in `README.md` (the "Defects found (summary)" table, the automated-scenarios table, and the "Last local run" counts if the suite size changed). If a new **runnable command** was added (a new npm script, a new k6 scenario/phase), also add it to `RUN_COMMANDS.md` so the canonical command list stays complete.
+Mirror any defect-table or automation changes in `README.md` (the "Defects found (summary)" table, the automated-scenarios table, ; leave the "Last local run" block to test-run-report, which mirrors §6). If a new **runnable command** was added (a new npm script, a new k6 scenario/phase), also add it to `RUN_COMMANDS.md` so the canonical command list stays complete.
 
 ### 6. Verify and report
 - `dump --grep <new id>` to confirm each edit landed; render a preview (`qlmanage -t -s 1400 -o <dir> file.docx` on macOS shows page 1; render a fragment alone to check a whole new section). Delete the `.bak` once it looks right.

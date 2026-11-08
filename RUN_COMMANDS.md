@@ -66,10 +66,24 @@ Or in the Postman app: **Import** → `postman/toolshop-api.postman_collection.j
 
 ```bash
 npm run perf:smoke          # 1 order/s per phase, ~2 min – safe for the public demo
-npm run perf:load           # full model 5/s → 20/s → peak 20/s → recovery (~18 min) – ONLY on an environment you own
-k6 run -e PROFILE=load -e API_URL=https://your-test-env perf/checkout-load.js   # full load against your own environment
+API_URL=http://localhost:8091 npm run perf:load   # full model 5/s → 20/s → peak 20/s → recovery (~18 min) – local Docker Toolshop ONLY
 k6 run -e USER_POOL=20 perf/checkout-load.js                                       # larger pool of test users
 ```
+
+**Local Toolshop for load runs** (Docker Desktop running; ~2 min the first time):
+
+```bash
+git clone --depth 1 https://github.com/testsmith-io/practice-software-testing.git ~/toolshop-local && cd ~/toolshop-local
+docker compose -f docker-compose.prod.yml up --pull missing -d laravel-api web mariadb   # API on http://localhost:8091
+# before EVERY load run: fresh data, then clear the API cache – the cached product list
+# otherwise returns IDs of products that no longer exist and every "add to cart" fails
+docker exec toolshop-laravel-api-1 php artisan migrate:fresh --seed --force
+docker exec toolshop-laravel-api-1 php artisan cache:clear
+API_URL=http://localhost:8091 npm run perf:load          # or perf:normal | perf:ramp | perf:peak | perf:recovery
+docker compose -f docker-compose.prod.yml down -v       # stop and remove it afterwards
+```
+
+The shop and k6 then share one machine, so results show what that machine can handle, not production capacity.
 
 Run one phase on its own (load-profile rates, starts at t=0, only that phase's latency thresholds):
 
@@ -77,12 +91,12 @@ Run one phase on its own (load-profile rates, starts at t=0, only that phase's l
 npm run perf:normal         # normal expected traffic – 5 orders/s for 5 min
 npm run perf:ramp           # gradual increase – ramps 5 → 20 orders/s over 5 min
 npm run perf:peak           # peak traffic – 20 orders/s for 5 min
-k6 run -e PROFILE=load -e PHASE=recovery perf/checkout-load.js                     # recovery – 5 orders/s for 3 min
-k6 run -e PROFILE=load -e PHASE=peak -e API_URL=https://your-test-env perf/checkout-load.js   # one phase against your own environment
+npm run perf:recovery       # recovery – 5 orders/s for 3 min
+API_URL=http://localhost:8091 npm run perf:peak                                     # one phase against the local Docker Toolshop
 k6 run -e PHASE=peak perf/checkout-load.js                                         # quick dry run of one phase at smoke rate (1/s, 30 s)
 ```
 
-Like `perf:load`, the per-phase npm scripts use load rates – run them **only against an environment you own**.
+Like `perf:load`, the per-phase npm scripts use load rates – run them **only against the local Docker Toolshop** (or another environment you own), with `API_URL` set. Reset the data and clear the cache before each run (see above).
 
 Summaries are written to `perf/results/*-summary.json`. The k6 exit code is non-zero if any threshold fails.
 
@@ -94,6 +108,14 @@ npx playwright show-trace test-results/<test-folder>/trace.zip  # trace of a fai
 ```
 
 Failed tests keep a screenshot, video and trace in `test-results/`.
+
+Log a run into the test report (section 6 of `docs/test-cases-and-automation.docx`, rebuilt from the run log `docs/test-run-log.jsonl`). The `test-run-report` skill does all of this; the parsing step on its own is:
+
+```bash
+python3 .claude/skills/test-run-report/scripts/parse_results.py \
+  playwright-report.json postman/results/newman-junit.xml perf/results/smoke-summary.json \
+  --log docs/test-run-log.jsonl
+```
 
 ## 8. Useful options
 

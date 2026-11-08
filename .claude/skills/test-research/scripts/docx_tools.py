@@ -12,6 +12,9 @@ OPS.json is a list of operations, applied in order:
       Exact text inside a single text run (<w:t>). Fails if not found.
   {"op": "replace_section", "heading": "4. Known defects", "fragment": "frag.docx"}
       Replace a Heading 1 section (up to the next Heading 1) with the body of FRAG.docx.
+  {"op": "replace_subsection", "heading": "3.6 Last results", "fragment": "frag.docx"}
+      Replace a Heading 2 sub-section (up to the next Heading 1 or 2) with the body of FRAG.docx.
+      The heading matches by prefix, so "3.6 Last results" finds "3.6 Last results (8 Nov 2026)".
   {"op": "append_section", "fragment": "frag.docx"}
       Append the body of FRAG.docx at the end of the document.
   {"op": "insert_rows_after", "row_id": "PAY-17", "rows": [["PAY-18", "Security", ...]]}
@@ -172,6 +175,27 @@ def op_replace_section(doc, op):
     return f'replace_section "{op["heading"]}": removed {end - start} blocks, inserted {len(new)}'
 
 
+def op_replace_subsection(doc, op):
+    blocks = kids(body(doc))
+    start = next((i for i, b in enumerate(blocks)
+                  if b.tagName == 'w:p' and style(b) == 'Heading2' and text(b).strip().startswith(op['heading'])), None)
+    if start is None:
+        sys.exit(f'replace_subsection: Heading 2 starting "{op["heading"]}" not found')
+    end = start + 1
+    while end < len(blocks) and blocks[end].tagName != 'w:sectPr' and not (
+            blocks[end].tagName == 'w:p' and style(blocks[end]) in ('Heading1', 'Heading2')):
+        end += 1
+    if blocks[end].tagName == 'w:p' and style(blocks[end]) == 'Heading1' and is_pagebreak(blocks[end - 1]):
+        end -= 1
+    anchor = blocks[end]
+    for b in blocks[start:end]:
+        body(doc).removeChild(b)
+    new = fragment_blocks(doc, op['fragment'])
+    for b in new:
+        body(doc).insertBefore(b, anchor)
+    return f'replace_subsection "{op["heading"]}": removed {end - start} blocks, inserted {len(new)}'
+
+
 def op_append_section(doc, op):
     sect = kids(body(doc), 'w:sectPr')[-1]
     new = fragment_blocks(doc, op['fragment'])
@@ -215,6 +239,7 @@ def op_append_to_cell(doc, op):
 OPS = {
     'replace_text': op_replace_text,
     'replace_section': op_replace_section,
+    'replace_subsection': op_replace_subsection,
     'append_section': op_append_section,
     'insert_rows_after': op_insert_rows_after,
     'append_to_cell': op_append_to_cell,

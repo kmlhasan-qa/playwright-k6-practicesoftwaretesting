@@ -96,7 +96,7 @@ This ensures that automation development and execution history are continuously 
 
 ## 1. Setup and execution
 
-**Prerequisites:** Node.js 20+ (22 recommended), npm, and [k6](https://k6.io/docs/get-started/installation/) for the performance tests.
+**Prerequisites:** Node.js 20+ (22 recommended), npm, [k6](https://k6.io/docs/get-started/installation/) for the performance tests, and [Docker Desktop](https://www.docker.com/products/docker-desktop/) for the k6 load runs (they run against a local copy of the Toolshop, never the public demo).
 
 ```bash
 git clone https://github.com/kmlhasan-qa/playwright-k6-practicesoftwaretesting.git
@@ -115,22 +115,40 @@ cp .env.example .env        # optional – every value has a default
 | `npm run test:defects` | executable defect reports only |
 | `npm run test:postman` | Postman collection via newman |
 | `npm run perf:smoke` | k6 smoke profile (safe for the public demo) |
-| `npm run perf:load` | full k6 load model – **only against an environment you own** |
-| `npm run perf:normal` / `perf:ramp` / `perf:peak` / `perf:recovery` | one load phase on its own (normal 5/s, ramp 5→20/s, peak 20/s, recovery 5/s) – **only against an environment you own** |
+| `API_URL=http://localhost:8091 npm run perf:load` | full k6 load model – against the **local Toolshop in Docker** (below), never the public demo |
+| `API_URL=http://localhost:8091 npm run perf:normal` / `perf:ramp` / `perf:peak` / `perf:recovery` | one load phase on its own (normal 5/s, ramp 5→20/s, peak 20/s, recovery 5/s) – local Toolshop only |
 | `npm run report` | open the last HTML report |
 
 See [`RUN_COMMANDS.md`](RUN_COMMANDS.md) for the full list.
 
 Environment variables (`.env` or shell): `BASE_URL`, `API_URL`, `HEADLESS`, `CUSTOMER_EMAIL`, `CUSTOMER_PASSWORD`. The k6 script takes `PROFILE`, `PHASE` (`all` \| `normal` \| `ramp_up` \| `peak` \| `recovery`), `API_URL` and `USER_POOL`.
 
+**Local Toolshop (Docker) for load tests.** The k6 load profiles create thousands of orders, so they run against a local copy of the Toolshop started from the upstream project's Docker images (sprint 5, the same version as the public demo). Only the API, web server and database are started; the API is on `http://localhost:8091`.
+
+```bash
+git clone --depth 1 https://github.com/testsmith-io/practice-software-testing.git ~/toolshop-local && cd ~/toolshop-local
+docker compose -f docker-compose.prod.yml up --pull missing -d laravel-api web mariadb
+# before every load run: fresh data, then clear the API cache (otherwise the cached
+# product list returns products the reset deleted, and every "add to cart" fails)
+docker exec toolshop-laravel-api-1 php artisan migrate:fresh --seed --force
+docker exec toolshop-laravel-api-1 php artisan cache:clear
+```
+
+Then run the load scripts with `API_URL=http://localhost:8091`, and stop the stack with `docker compose -f docker-compose.prod.yml down -v`. The shop and k6 share one machine, so these results show what that machine can handle, not the capacity of production.
+
 **CI:** `.github/workflows/playwright.yml` runs the `api` and `ui` projects plus the Postman collection on every push, every PR and nightly, and uploads the reports. The k6 smoke run is manual only (workflow_dispatch), so the public demo never gets automatic load.
 
 **Last local run (8 Nov 2026):**
-- Playwright UI: 3 passed (TC-UI-001, TC-UI-002; TC-UI-003 is the DEF-001 test and fails as expected).
-- Playwright API: 52 passed (37 functional tests; the other 15 are known-defect tests that fail as expected).
-- newman: 33 requests, 56/56 assertions passed.
-- k6 smoke (public demo, 19:55): every threshold passed; 123 of 123 orders with 0% errors and 0 dropped iterations. Booking p95: normal 361 ms, ramp 439 ms, peak 376 ms, recovery 344 ms.
-- k6 load / single phases: not run (they need an environment you own). Run history: `perf/results/history.jsonl`.
+- Playwright UI (19:34): 3 tests – 2 passed; TC-UI-003 is the DEF-001 test and fails as expected. 0 failed.
+- Playwright API (19:34): 52 tests – 37 passed; the other 15 are known-defect tests that fail as expected. 0 failed.
+- newman (19:27): 33 requests, 56/56 assertions passed.
+- k6 smoke (public demo, 19:53): every threshold passed; 123 of 123 orders with 0% errors and 0 dropped iterations. Booking p95: normal 361 ms, ramp 439 ms, peak 376 ms, recovery 344 ms.
+- k6 load, full model (local Docker Toolshop, 20:19, ~18 min): every threshold passed; 12,150 orders at 11.2/s average, 0% errors, 0 dropped. Booking p95: normal 20 ms, ramp 16 ms, peak 17 ms, recovery 19 ms.
+- k6 normal / ramp / peak phases on their own (local Docker Toolshop, 5 min each): every threshold passed; 1,501 / 3,750 / 6,001 orders, 0% errors, 0 dropped. Booking p95 22 / 16 / 15 ms.
+- k6 recovery phase on its own: not run separately (covered by the full load run).
+- The local numbers have no internet latency and show what one MacBook can handle, not production capacity.
+
+Details of each run (commit, target, every test and threshold) and the run history: `docs/test-cases-and-automation.docx` §6, built from `docs/test-run-log.jsonl`.
 
 ---
 
@@ -229,13 +247,15 @@ Full reports, sorted by severity and priority: `docs/test-cases-and-automation.d
 - Fewer than 10 dropped iterations.
 - The run aborts if the overall error rate goes above 5%.
 
-The workload model, checks and threshold reasoning are explained in `docs/test-cases-and-automation.docx` §3.4.
+**Where each profile runs:** the smoke profile (1 order/s) runs against the public demo; the full load profile and the single load phases run against the local Toolshop in Docker (see section 1), so the shared demo never receives load.
+
+The workload model, checks and threshold reasoning are explained in `docs/test-cases-and-automation.docx` §3.4; the results of every run kind are in §6.5.
 
 ---
 
 ## 5. What I would improve with more time
 
-- **Own environment.** Run the Toolshop locally with Docker Compose (the upstream project ships a `docker-compose.yml`) in CI. Tests would then not depend on, or pollute, the shared demo, the database could be reset per run, and the full k6 load profile could run.
+- **Own environment in CI.** The k6 load runs already use a local Toolshop in Docker. The next step is to start the same stack in CI and point every suite at it, so CI no longer depends on, or pollutes, the shared demo and the database is reset per run.
 - **More checkout coverage:** guest checkout (`/invoices/guest`), and changing the quantity or removing a line in the cart through the UI. (The other payment methods are covered at API level by TC-API-037.)
 - **Contract tests** generated from the OpenAPI spec (e.g. `ajv` against `/docs?api-docs.json`) instead of hand-written `toMatchObject`.
 - **Session reuse** with `storageState` for UI tests that don't need to exercise login.

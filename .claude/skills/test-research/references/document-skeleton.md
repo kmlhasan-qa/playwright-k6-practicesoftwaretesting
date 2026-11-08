@@ -4,7 +4,7 @@
 
 ## Rules
 - Create it only if `docs/test-cases-and-automation.docx` doesn't exist. If it exists, never regenerate it; dump it and edit in place.
-- Keep the section numbers and heading texts below exactly: the skills find sections by their Heading 1 text (`replace_section "4. Known defects"`) and by text such as `Totals:` and `Last results (`.
+- Keep the section numbers and heading texts below exactly: the skills find sections by their Heading 1 text (`replace_section "4. Known defects"`) and by text such as `Totals:`. Section 6 "6. Test run results" is regenerated as a whole by test-run-report from `docs/test-run-log.jsonl`; no other skill edits it.
 - Fill only what you actually have. Sections with nothing yet keep their one-line "nothing yet" sentence. Never invent cases, results or defects to fill a table.
 - Catalogue areas are chosen per project from its real features (e.g. AUTH, MENU, CART, PROMO, PAY, ORD, ADMIN, CASH, DB, NF). Keep the area list in §1's intro table, and add new areas as new `### 1.n` tables later.
 - Adding to an existing document: use `insert_rows_after` (it clones a data row) when the table already has rows. A table that has **only its header row** can't be extended that way. Rebuild that whole Heading 1 section as Markdown (keeping everything already in it) and use `replace_section`. Remove a "nothing yet" sentence once its table has rows.
@@ -27,7 +27,7 @@ Keep the source Markdown in the scratchpad only. The .docx is the record from th
 
 **System under test:** <what it is, URLs, repo> · **Commit:** <sha> · **Created:** <date> by <author> with Claude Code
 
-This document is the single record of testing for <project>: the test case catalogue (§1), the automated tests (§2), how to run them and the latest results (§3), known defects (§4) and the code inspection log (§5). It is updated in place after each research, inspection or test run.
+This document is the single record of testing for <project>: the test case catalogue (§1), the automated tests (§2), how to run them (§3), known defects (§4), the code inspection log (§5) and the test run results – latest run of every suite with its details, and the run history (§6). It is updated in place after each research, inspection or test run.
 
 ## 1. Test case catalogue
 
@@ -62,15 +62,14 @@ Totals: <n> cases in <k> areas; <a> automated, <m> manual; <f> automated tests f
 <fixtures, seed data, test accounts; how each run isolates its data>
 
 ### 3.4 Performance
-<k6 scenarios and their thresholds, or "No performance tests yet.">. Results so far: <none yet>.
+<k6 scenarios and their thresholds, or "No performance tests yet.">. Results: see section 6.5.
 
 ### 3.5 Limitations
 <what the automation can't cover (real payment gateway, email/WhatsApp delivery, production data) and why>
 
-### 3.6 Last results (<date>)
-| Suite | Result | Notes |
-|---|---|---|
-| <suite> | <n passed / n failed / n todo-or-expected-fail> | <what didn't run and why> |
+### 3.6 Test results
+
+The results of the latest runs, with the details of each run and the run history, are in section 6.
 
 ## 4. Known defects
 
@@ -103,6 +102,12 @@ Defects are listed only when reproduced (by a failing test, a probe on a local e
 
 ### 5.3 Code health notes
 <Info-level items: missing CI, dead code, TODOs, large files, flaky tests. Not defects.>
+
+## 6. Test run results
+
+No test runs logged yet. The test-run-report skill replaces this section after the first run (render_results_section.py from docs/test-run-log.jsonl).
 ```
+
+When a skill that creates the document has real run results (e.g. codebase-qa's final run), log them with test-run-report's `parse_results.py --log docs/test-run-log.jsonl` and put the rendered section 6 in place of the placeholder instead of writing numbers by hand. Suites with no machine-readable result file (e.g. `node:test` text output) go in a short paragraph in §6 under "### 6.1 Latest run summary" as a Suite | Last run | Commit | Result table, noting how the counts were read.
 
 Detailed defect reports (one Field | Value table per DEF, as described in research-guide.md §5) go in §4 after the 4.1 list.
